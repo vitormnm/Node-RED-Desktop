@@ -1,6 +1,6 @@
-# node-RED-desktop
+# Node-RED-Desktop
 
-node-red executable desktop.
+Node-RED executable desktop.
 
 no need to install node-red and nodejs.
 Using only Electron.js
