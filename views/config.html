@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- bootstrap 5.3.3 -->
+  <link href="../views/static/bootstrap.min.css" rel="stylesheet">
+  <title>Settings</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row mt-4">
+
+      <div class="col">
+        <div class="mb-4">
+          <h3>Server settings</h3>
+        </div>
+
+
+        <div id="Render_form_checkbox_password" class="mb-4">
+
+        </div>
+
+        <div id="Render_form_password">
+
+        </div>
+
+        
+
+        <div id="Render_form_checkbox_projects" class="mb-4">
+          <input type="checkbox" class="form-check-input" id="inp_projects">
+          <label class="form-check-label" for="exampleCheck1">Enabled Projects</label>
+          <div class="form-text">Projects with git integration (Requires git installed)</div>
+        </div>
+
+        <div id="Render_form_uiPort" class="mt-4 mb-4">
+
+          <div>
+            <label class="form-label">Port</label>
+            <input type="number" class="form-control" id="inp_uiPort">
+          </div>
+
+        </div>
+
+        <div id="Render_form_httpAdminRoot" class="mt-4 mb-4">
+
+          <div>
+            <label class="form-label">http Admin Root</label>
+            <input type="text" class="form-control" id="inp_httpAdminRoot">
+          </div>
+
+        </div>
+
+
+        <div id="Render_form_httpNodeRoot" class="mt-4 mb-4">
+
+          <div>
+            <label class="form-label">http Node Root</label>
+            <input type="text" class="form-control" id="inp_httpNodeRoot">
+          </div>
+
+        </div>
+
+        <div id="Render_form_flowFile" class="mt-4 mb-4">
+
+          <div>
+            <label class="form-label">Flow file name</label>
+            <input type="text" class="form-control" id="inp_flowFile">
+          </div>
+
+        </div>
+
+    
+
+        <div id="Render_form_StaticFolder" class="mt-4 mb-4">
+
+          <div>
+            <label class="form-label">Folder static files</label>
+            <input type="text" class="form-control" id="inp_StaticFolder">
+            <div class="form-text">folder will have to be created in the root of the executable program</div>
+          </div>
+
+        </div>
+
+        <div class="mb-4">
+          <h3>Desktop view</h3>
+        </div>
+
+        <div id="Render_form_AdminTitle" class="mb-4">
+          <label class="form-label">Admin title</label>
+          <input type="text" class="form-control" id="inp_AdminTitle">
+        </div>
+
+        <div id="Render_form_UrlHomeScreen" class="mb-4">
+          <label class="form-label">Init url</label>
+          <input type="text" class="form-control" id="inp_UrlHomeScreen" value="${data.UrlHomeScreen}">
+          <div class="form-text">Empty value does not open the home screen</div>
+        </div>
+
+        <div id="Render_form_UrlAdmin" class="mb-4">
+          <label class="form-label">Url admin Node-RED</label>
+          <input type="text" class="form-control" id="inp_UrlAdmin">
+        </div>
+
+        <div id="Render_form_UrlDashboard" class="mb-4">
+          <label class="form-label">Url Dashboard Node-RED</label>
+          <input type="text" class="form-control" id="inp_UrlDashboard">
+        </div>
+
+        <div class="mb-4">
+          <button onclick="save_settings()" class="btn btn-danger">save settings</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</body>
+
+
+</html>
+<script src="./config.js"></script>
+<script src="./save_settings.js"></script>
+<script src="./config_settings.js"></script>
+
+<script src="../views/static/bootstrap.bundle.min.js"></script>

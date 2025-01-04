@@ -1,0 +1,30 @@
+# node-RED-desktop
+
+node-red executable desktop.
+
+no need to install node-red and nodejs.
+Using only Electron.js
+
+windows 10 x64 , windows 11 x64, Ubunto LTS x64
+
+![node-red-desktop](/resources/node-red-desktop-demonstration.gif) 
+
+## Build
+
+clone app, open the project directory
+
+```bash
+  npm install
+```
+Build 64 bits
+```bash
+  npm run build64
+```
+
+## author
+
+- [@vitormnm](https://www.vitormiao.com/)
+
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+
+

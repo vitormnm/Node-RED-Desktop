@@ -1,0 +1,22 @@
+{
+  "name": "Node-RED-Desktop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron main.js",
+    "build64": "electron-packager  . Node-RED-Desktop --icon=./resources/nodered.ico --platform=win32 --arch=x64  --out=build --asar --overwrite --win32metadata.CompanyName='VitorMiao' --win32metadata.ProductName='Node-RED-Desktop'",
+    "build32": "electron-packager . Node-RED-Desktop --icon=./resources/nodered.ico --platform=win32 --arch=ia32  --out=build --asar --overwrite --win32metadata.CompanyName='VitorMiao' --win32metadata.ProductName='Node-RED-Desktop'",
+    "build64linux": "electron-packager . Node-RED-Desktop --platform=linux --arch=x64 --out=build --overwrite"
+ 
+  },
+  "author": "Vitor Miao",
+  "license": "MIT",
+  "dependencies": {
+    "node-red": "4.0.8"
+  },
+  "devDependencies": {
+    "electron": "33.2.1",
+    "@electron/packager": "18.3.6"
+  }
+}
