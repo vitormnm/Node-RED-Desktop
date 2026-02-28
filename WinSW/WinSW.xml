@@ -1,0 +1,20 @@
+<service>
+   <!-- WinSW-x64 v2.12.0 -->
+  <id>Node-RED-Desktop</id>
+  <name>Node-RED-Desktop</name>
+  <description>Node-RED-Desktop </description>
+  
+  <executable>C:\Node-RED-Desktop-win32-x64\Node-RED-Desktop.exe</executable>
+  <arguments></arguments>
+  <workingdirectory>C:\Node-RED-Desktop-win32-x64\</workingdirectory>
+
+  <!-- Gera logs -->
+  <logpath>C:\Node-RED-Desktop-win32-x64\logs</logpath>
+  <log mode="roll"></log>
+
+  <!-- Reinicia se travar -->
+  <onfailure action="restart" delay="5 sec"/>
+
+ <!-- Define o modo de inicialização -->
+  <startmode>Automatic</startmode>
+</service>
