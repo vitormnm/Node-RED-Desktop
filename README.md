@@ -23,7 +23,7 @@ Build 64 bits
 
 ## author
 
-- [@vitormnm](https://www.vitormiao.com/)
+- [@vitormnm](https://www.vitormiao.com)
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 
