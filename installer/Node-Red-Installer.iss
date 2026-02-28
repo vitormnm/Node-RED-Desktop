@@ -22,7 +22,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-SetupIconFile=D:\github\Node-RED-Desktop-V3\Node-RED-Desktop-V3\resources\nodered.ico
+SetupIconFile=D:\github\Node-RED-Desktop\resources\nodered.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 DefaultDirName={autopf}\{#MyAppName}
 ; "ArchitecturesAllowed=x64compatible" specifies that Setup cannot run
@@ -53,9 +53,9 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "D:\github\Node-RED-Desktop-V3\Node-RED-Desktop-V3\build\NodeRedDesktop-win32-x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\github\Node-RED-Desktop-V3\Node-RED-Desktop-V3\build\NodeRedDesktop-win32-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\github\Node-RED-Desktop-V3\Node-RED-Desktop-V3\build\node-v22.12.0-x64.msi"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\github\Node-RED-Desktop\build\NodeRedDesktop-win32-x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\github\Node-RED-Desktop\build\NodeRedDesktop-win32-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "D:\github\Node-RED-Desktop\build\node-v22.12.0-x64.msi"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]
@@ -83,7 +83,7 @@ var
   ResultCode: Integer;
 begin
   if CurStep = ssPostInstall then begin
-    // Se a pasta do Node.js não existir, instala
+    // Se a pasta do Node.js nï¿½o existir, instala
     if not DirExists(ExpandConstant('{pf}\nodejs')) then begin
       //MsgBox('Node.js not found. Installing...', mbInformation, MB_OK);
       Exec(ExpandConstant('{sys}\msiexec.exe'),
