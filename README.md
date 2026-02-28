@@ -6,10 +6,12 @@ no need to install node-red and nodejs.
 Using only Electron.js and VUE 3
 
 Multiple instances
-Run as a Windows service
-Redundancy between two applications
-Logging of multiple instance records to files
 
+Run as a Windows service
+
+Redundancy between two applications
+
+Logging of multiple instance records to files
 
 windows 10 x64 , windows 11 x64, Ubunto LTS x64
 
