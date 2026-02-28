@@ -1,22 +1,32 @@
 {
-  "name": "Node-RED-Desktop",
-  "version": "1.0.0",
-  "description": "",
-  "main": "main.js",
+  "name": "nodered",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "electron/main.js",
   "scripts": {
-    "start": "electron main.js",
-    "build64": "electron-packager  . Node-RED-Desktop --icon=./resources/nodered.ico --platform=win32 --arch=x64  --out=build --asar --overwrite --win32metadata.CompanyName='VitorMiao' --win32metadata.ProductName='Node-RED-Desktop'",
-    "build32": "electron-packager . Node-RED-Desktop --icon=./resources/nodered.ico --platform=win32 --arch=ia32  --out=build --asar --overwrite --win32metadata.CompanyName='VitorMiao' --win32metadata.ProductName='Node-RED-Desktop'",
-    "build64linux": "electron-packager . Node-RED-Desktop --platform=linux --arch=x64 --out=build --overwrite"
- 
+    "prod": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "dev": "cross-env NODE_ENV=dev concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "build": "vite build",
+    "preview": "vite preview",
+    "build64": "npm run build && electron-packager . NodeRedDesktop --icon=./electron/resources/nodered.ico --platform=win32 --arch=x64 --out=build --asar --overwrite --win32metadata.CompanyName=VitorMiao --win32metadata.ProductName='Node-RED-Desktop' --prune=true --ignore=\"^/(src|node_modules/(vue|vite|vue-router))\" && xcopy WinSW build\\NodeRedDesktop-win32-x64\\WinSW\\ /E /I /Y"
   },
-  "author": "Vitor Miao",
-  "license": "MIT",
   "dependencies": {
-    "node-red": "4.0.8"
+    "node-red": "^4.1.3",
+    "vue": "^3.5.24",
+    "vue-router": "^4.6.4",
+    "vuetify": "^3.11.6",
+    "@fontsource/roboto": "^5.2.9",
+    "@mdi/font": "^7.4.47"
   },
   "devDependencies": {
-    "electron": "33.2.1",
-    "@electron/packager": "18.3.6"
+    "@electron/packager": "^19.0.1",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "electron": "^39.2.7",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "unplugin-fonts": "^1.4.0",
+    "vite": "^7.2.4",
+    "wait-on": "^9.0.3"
   }
 }

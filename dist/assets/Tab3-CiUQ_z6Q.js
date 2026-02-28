@@ -1,0 +1,1 @@
+import{_ as n}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{c as t,w as r,r as s,o as c,b as a}from"./index-DTvI6pW8.js";const _={};function l(p,o){const e=s("v-card");return c(),t(e,{class:"pa-4"},{default:r(()=>[...o[0]||(o[0]=[a("h2",null,"Tab 3 — Página",-1),a("p",null,"Conteúdo da página 3.",-1)])]),_:1})}const i=n(_,[["render",l]]);export{i as default};
