@@ -14,10 +14,20 @@
         <v-icon left>mdi-stop</v-icon>
         stop
       </v-btn>
+
+      <v-text-field
+        v-model="search"
+        label="search"
+        density="compact"
+        variant="outlined"
+        hide-details
+        clearable
+        class="search-field mx-1"
+      />
     </div>
 
     <div class="table-wrapper">
-      <v-data-table :items="projects" :headers="headers" class="elevation-1 fixed-table" item-key="id"
+      <v-data-table :items="projects" :headers="headers" :search="search" class="elevation-1 fixed-table" item-key="id"
         hide-default-footer>
 
         <!-- ✅ HEADER DO CHECKBOX -->
@@ -87,6 +97,7 @@ const headers = [
 
 var projects = ref([]);
 const selected = ref([]);
+const search = ref("");
 
 
 onMounted(async () => {
@@ -341,6 +352,10 @@ function toggleAll(value) {
   justify-content: flex-start;
   /* 👈 muda aqui */
   margin-bottom: 12px;
+}
+
+.search-field {
+  max-width: 280px;
 }
 </style>
 
