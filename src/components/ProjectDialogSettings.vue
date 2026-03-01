@@ -26,8 +26,11 @@
         <v-card class="mb-3" variant="outlined">
           <v-expansion-panels>
             <v-expansion-panel>
-              <v-expansion-panel-title>
+              <v-expansion-panel-title :class="{ 'security-users-title': hasEmptyUserError }">
                 Security Users
+                <span v-if="hasEmptyUserError" class="security-users-warning">
+                  One or more users have validation errors
+                </span>
               </v-expansion-panel-title>
 
               <v-expansion-panel-text>
@@ -37,8 +40,8 @@
                     :key="`admin-auth-user-${index}`"
                     elevation="1"
                   >
-                    <v-expansion-panel-title>
-                      {{ user.username || "Usuario" }}
+                    <v-expansion-panel-title :class="{ 'security-user-title--error': userHasError(index) }">
+                      {{ user.username || "User" }}
                     </v-expansion-panel-title>
 
                     <v-expansion-panel-text>
@@ -48,7 +51,7 @@
                             label="User"
                             type="text"
                             v-model="user.username"
-                            :error-messages="errors.user"
+                            :error-messages="getUserMessages(index)"
                           />
                         </v-col>
 
@@ -57,7 +60,7 @@
                             label="Password"
                             type="password"
                             v-model="user.password"
-                            :error-messages="errors.password"
+                            :error-messages="getPasswordMessages(index)"
                           />
                         </v-col>
 
@@ -78,7 +81,7 @@
                         :disabled="local.settings.adminAuth.users.length === 1"
                         @click="removeAdminUser(index)"
                       >
-                        Excluir usuario
+                        Delete
                       </v-btn>
                     </v-expansion-panel-text>
                   </v-expansion-panel>
@@ -120,6 +123,8 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
+
 const permissionOptions = [
   { title: "Admin", value: "*" },
   { title: "Reader", value: "read" }
@@ -177,10 +182,50 @@ const props = defineProps({
   }
 });
 
+const hasEmptyUserError = computed(() =>
+  (Array.isArray(props.errors.user) && props.errors.user.some((message) => message.startsWith("User "))) ||
+  (Array.isArray(props.errors.password) && props.errors.password.some((message) => message.startsWith("Password ")))
+);
+
+function getUserMessages(index) {
+  if (!Array.isArray(props.errors.user)) {
+    return [];
+  }
+  const marker = `User ${index + 1} `;
+  return props.errors.user.filter((message) => message.startsWith(marker));
+}
+
+function getPasswordMessages(index) {
+  if (!Array.isArray(props.errors.password)) {
+    return [];
+  }
+  const marker = `Password ${index + 1} `;
+  return props.errors.password.filter((message) => message.startsWith(marker));
+}
+
+function userHasError(index) {
+  return getUserMessages(index).length > 0 || getPasswordMessages(index).length > 0;
+}
+
 </script>
 
 <style scoped>
 .dialog-content {
   min-width: 0;
+}
+
+.security-users-title {
+  color: #b71c1c;
+}
+
+.security-users-warning {
+  color: #b71c1c;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.security-user-title--error {
+  color: #b71c1c;
 }
 </style>
