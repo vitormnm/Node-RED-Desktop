@@ -305,6 +305,30 @@ watch(
         ]
       };
     }
+
+    if (!Array.isArray(local.settings.adminAuth.users) || local.settings.adminAuth.users.length === 0) {
+      local.settings.adminAuth.users = [
+        {
+          username: "",
+          password: "",
+          permissions: "*"
+        }
+      ];
+    }
+
+    local.settings.adminAuth.users.forEach((user) => {
+      if (typeof user.username !== "string") {
+        user.username = "";
+      }
+
+      if (typeof user.password !== "string") {
+        user.password = "";
+      }
+
+      if (user.permissions !== "read" && user.permissions !== "*") {
+        user.permissions = "*";
+      }
+    });
   },
   { deep: true }
 );
@@ -383,8 +407,45 @@ async function validate() {
     ok = false;
   }
 
+  if (local.adminAuth) {
+    if (!Array.isArray(local.settings.adminAuth.users) || local.settings.adminAuth.users.length === 0) {
+      errors.user.push("Informe ao menos um usuario.");
+      ok = false;
+    } else {
+      const normalizedUsernames = new Set();
+      let hasDuplicateUsernames = false;
+
+      local.settings.adminAuth.users.forEach((user, index) => {
+        const username = String(user.username ?? "").trim();
+        const normalizedUsername = username.toLowerCase();
+
+        if (!username) {
+          errors.user.push(`Usuario ${index + 1} nao pode estar vazio.`);
+          ok = false;
+        } else if (normalizedUsernames.has(normalizedUsername)) {
+          hasDuplicateUsernames = true;
+          ok = false;
+        } else {
+          normalizedUsernames.add(normalizedUsername);
+        }
+
+        if (!String(user.password ?? "").trim()) {
+          errors.password.push(`Senha ${index + 1} nao pode estar vazia.`);
+          ok = false;
+        }
+      });
+
+      if (hasDuplicateUsernames) {
+        errors.user.push("Duplicate usernames are not allowed.");
+        notify.error("Duplicate usernames are not allowed.");
+      }
+    }
+  }
+
   if (!ok) {
-    notify.error("Existem erros no formulario. Verifique os campos.");
+    if (!errors.user.includes("Duplicate usernames are not allowed.")) {
+      notify.error("Existem erros no formulario. Verifique os campos.");
+    }
   }
 
   return ok;
@@ -446,7 +507,7 @@ async function onSave() {
   }
 
   if (payloadAddProject.status === false) {
-    notify.error("Erro ao salvar o projeto.");
+    notify.error(payloadAddProject.message || "Failed to save project.");
     return;
   }
 
