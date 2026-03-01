@@ -8,6 +8,25 @@ import { randomUUID } from 'crypto';
 const diretorioExecucao = path.dirname(app.getPath('exe'));
 import Logger from "../services/Logger.js";
 
+function hasDuplicateUsernames(users) {
+    const normalized = new Set();
+
+    for (const user of users) {
+        const username = String(user?.username ?? "").trim().toLowerCase();
+        if (!username) {
+            continue;
+        }
+
+        if (normalized.has(username)) {
+            return true;
+        }
+
+        normalized.add(username);
+    }
+
+    return false;
+}
+
 class ControlProject {
 
     async add(iPayload) {
@@ -32,7 +51,12 @@ class ControlProject {
                 var adminAuth = null;
                 //CheckPassword
                 if (iPayload.adminAuth == true) {
-                    adminAuth = await Password_settings.enable_password_writing(iPayload.settings.adminAuth.users[0].username, iPayload.settings.adminAuth.users[0].password);
+                    const users = Array.isArray(iPayload?.settings?.adminAuth?.users) ? iPayload.settings.adminAuth.users : [];
+                    if (hasDuplicateUsernames(users)) {
+                        return { "status": false, "message": "Duplicate usernames are not allowed." };
+                    }
+
+                    adminAuth = await Password_settings.enable_password_writing(iPayload.settings.adminAuth.users);
                 }
 
                 var id = randomUUID()
@@ -92,7 +116,7 @@ class ControlProject {
                 Logger.info(`${iPayload.name} created`)
                 result = { "status": true }
             } else {
-                result = { "status": false }
+                result = { "status": false, "message": "Project name already exists." }
             }
 
             BrowserWindow.getAllWindows().forEach(win => {
@@ -120,7 +144,12 @@ class ControlProject {
             var adminAuth = null;
             //CheckPassword
             if (iPayload.adminAuth == true) {
-                adminAuth = await Password_settings.enable_password_writing(iPayload.settings.adminAuth.users[0].username, iPayload.settings.adminAuth.users[0].password);
+                const users = Array.isArray(iPayload?.settings?.adminAuth?.users) ? iPayload.settings.adminAuth.users : [];
+                if (hasDuplicateUsernames(users)) {
+                    return { "status": false, "message": "Duplicate usernames are not allowed." };
+                }
+
+                adminAuth = await Password_settings.enable_password_writing(iPayload.settings.adminAuth.users);
             }
 
             var newProject = {
@@ -193,7 +222,7 @@ class ControlProject {
 
         } catch {
             Logger.info(`${iPayload.name} erro update`)
-            return { "status": false }
+            return { "status": false, "message": "Failed to update project." }
         }
 
     }

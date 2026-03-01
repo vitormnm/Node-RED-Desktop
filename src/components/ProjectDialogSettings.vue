@@ -23,8 +23,82 @@
       </v-row>
 
       <template v-if="local.adminAuth">
-        <v-text-field label="User" type="text" v-model="local.settings.adminAuth.users[0].username" :error-messages="errors.user" />
-        <v-text-field label="Password" type="password" v-model="local.settings.adminAuth.users[0].password" :error-messages="errors.password" />
+        <v-card class="mb-3" variant="outlined">
+          <v-expansion-panels>
+            <v-expansion-panel>
+              <v-expansion-panel-title :class="{ 'security-users-title': hasEmptyUserError }">
+                Security Users
+                <span v-if="hasEmptyUserError" class="security-users-warning">
+                  One or more users have validation errors
+                </span>
+              </v-expansion-panel-title>
+
+              <v-expansion-panel-text>
+                <v-expansion-panels multiple class="mb-3">
+                  <v-expansion-panel
+                    v-for="(user, index) in local.settings.adminAuth.users"
+                    :key="`admin-auth-user-${index}`"
+                    elevation="1"
+                  >
+                    <v-expansion-panel-title :class="{ 'security-user-title--error': userHasError(index) }">
+                      {{ user.username || "User" }}
+                    </v-expansion-panel-title>
+
+                    <v-expansion-panel-text>
+                      <v-row>
+                        <v-col cols="12" md="4">
+                          <v-text-field
+                            label="User"
+                            type="text"
+                            v-model="user.username"
+                            :error-messages="getUserMessages(index)"
+                          />
+                        </v-col>
+
+                        <v-col cols="12" md="4">
+                          <v-text-field
+                            label="Password"
+                            type="password"
+                            v-model="user.password"
+                            :error-messages="getPasswordMessages(index)"
+                          />
+                        </v-col>
+
+                        <v-col cols="12" md="4">
+                          <v-select
+                            label="Role"
+                            v-model="user.permissions"
+                            :items="permissionOptions"
+                            variant="outlined"
+                          />
+                        </v-col>
+                      </v-row>
+
+                      <v-btn
+                        size="small"
+                        color="red"
+                        prepend-icon="mdi-delete"
+                        :disabled="local.settings.adminAuth.users.length === 1"
+                        @click="removeAdminUser(index)"
+                      >
+                        Delete
+                      </v-btn>
+                    </v-expansion-panel-text>
+                  </v-expansion-panel>
+                </v-expansion-panels>
+
+                <v-btn
+                  size="small"
+                  color="grey"
+                  prepend-icon="mdi-plus"
+                  @click="addAdminUser"
+                >
+                  Add user
+                </v-btn>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </v-card>
       </template>
 
       <v-text-field label="http Admin Root" v-model="local.settings.httpAdminRoot" :error-messages="errors.httpAdminRoot" />
@@ -49,7 +123,47 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from "vue";
+
+const permissionOptions = [
+  { title: "Admin", value: "*" },
+  { title: "Reader", value: "read" }
+];
+
+function addAdminUser() {
+  const users = getAdminUsers();
+  users.push({
+    username: "",
+    password: "",
+    permissions: "*"
+  });
+}
+
+function removeAdminUser(index) {
+  const users = getAdminUsers();
+  if (users.length <= 1) {
+    return;
+  }
+
+  users.splice(index, 1);
+}
+
+function getAdminUsers() {
+  if (!props.local.settings.adminAuth) {
+    props.local.settings.adminAuth = {
+      type: "credentials",
+      users: []
+    };
+  }
+
+  if (!Array.isArray(props.local.settings.adminAuth.users)) {
+    props.local.settings.adminAuth.users = [];
+  }
+
+  return props.local.settings.adminAuth.users;
+}
+
+const props = defineProps({
   local: {
     type: Object,
     required: true
@@ -67,10 +181,51 @@ defineProps({
     required: true
   }
 });
+
+const hasEmptyUserError = computed(() =>
+  (Array.isArray(props.errors.user) && props.errors.user.some((message) => message.startsWith("User "))) ||
+  (Array.isArray(props.errors.password) && props.errors.password.some((message) => message.startsWith("Password ")))
+);
+
+function getUserMessages(index) {
+  if (!Array.isArray(props.errors.user)) {
+    return [];
+  }
+  const marker = `User ${index + 1} `;
+  return props.errors.user.filter((message) => message.startsWith(marker));
+}
+
+function getPasswordMessages(index) {
+  if (!Array.isArray(props.errors.password)) {
+    return [];
+  }
+  const marker = `Password ${index + 1} `;
+  return props.errors.password.filter((message) => message.startsWith(marker));
+}
+
+function userHasError(index) {
+  return getUserMessages(index).length > 0 || getPasswordMessages(index).length > 0;
+}
+
 </script>
 
 <style scoped>
 .dialog-content {
   min-width: 0;
+}
+
+.security-users-title {
+  color: #b71c1c;
+}
+
+.security-users-warning {
+  color: #b71c1c;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.security-user-title--error {
+  color: #b71c1c;
 }
 </style>

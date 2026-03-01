@@ -13,20 +13,13 @@ export function registerProjectRoutes() {
     return [{ id: 1, name: "Teste" }];
   });
 
-  ipcMain.handle('POST:/oba2', async (_, data) => {
-
-    return { success: true };
-  });
 
   ipcMain.handle('DELETE:/projects/:id', async (_, { id }) => {
     console.log("delete project", id);
     return { deleted: true };
   });
 
-  //Read full config.json file
-  ipcMain.handle('POST:/oba', async (event, data) => {
-    console.log("novo projeto oba ", data);
-  })
+ 
 
   //Read full config.json file
   ipcMain.handle('GET:/checkSettings', async (event, data) => {
