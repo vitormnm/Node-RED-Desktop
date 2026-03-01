@@ -8,25 +8,35 @@ class Password_settings {
 
     constructor() {}
 
-    async enable_password_writing(UserName, PassWord) {
-
-        let hashedPassword = "";
+    async enable_password_writing(users = []) {
 
         try {
             const saltRounds = 10;
 
-            // Hash da senha
-            hashedPassword = await bcrypt.hash(PassWord, saltRounds);
+            const normalizedUsers = Array.isArray(users) ? users : [];
+            const hashedUsers = [];
+
+            for (const user of normalizedUsers) {
+                const username = String(user?.username ?? "").trim();
+                const passwordInput = String(user?.password ?? "");
+                const permissions = user?.permissions === "read" ? "read" : "*";
+
+                // Preserve already hashed passwords on update.
+                const isAlreadyHashed = /^\$2[aby]\$\d+\$/.test(passwordInput);
+                const password = isAlreadyHashed
+                    ? passwordInput
+                    : await bcrypt.hash(passwordInput, saltRounds);
+
+                hashedUsers.push({
+                    username,
+                    password,
+                    permissions
+                });
+            }
 
             return {
                 type: "credentials",
-                users: [
-                    {
-                        username: UserName,
-                        password: hashedPassword,
-                        permissions: "*"
-                    }
-                ]
+                users: hashedUsers
             };
 
         } catch (error) {

@@ -91,7 +91,7 @@
   <v-dialog v-model="deleteDialog" max-width="420">
     <v-card>
       <v-card-title class="text-h6">
-        Confirmar exclusao
+        Confirm deletion
       </v-card-title>
 
       <v-card-text>
@@ -305,6 +305,30 @@ watch(
         ]
       };
     }
+
+    if (!Array.isArray(local.settings.adminAuth.users) || local.settings.adminAuth.users.length === 0) {
+      local.settings.adminAuth.users = [
+        {
+          username: "",
+          password: "",
+          permissions: "*"
+        }
+      ];
+    }
+
+    local.settings.adminAuth.users.forEach((user) => {
+      if (typeof user.username !== "string") {
+        user.username = "";
+      }
+
+      if (typeof user.password !== "string") {
+        user.password = "";
+      }
+
+      if (user.permissions !== "read" && user.permissions !== "*") {
+        user.permissions = "*";
+      }
+    });
   },
   { deep: true }
 );
@@ -323,68 +347,117 @@ async function validate() {
     const projectNameCheck = checkSettings.projects.some((u) => u.name === local.name);
 
     if (projectNameCheck) {
-      errors.name.push("O nome ja existe");
+      errors.name.push("Name already exists.");
       ok = false;
     }
   }
 
   if (!local.name.trim()) {
-    errors.name.push("O nome nao pode estar vazio.");
+    errors.name.push("Name cannot be empty.");
     ok = false;
   }
 
   if (!local.uiPort || local.uiPort <= 0) {
-    errors.uiPort.push("Porta invalida.");
+    errors.uiPort.push("Invalid port.");
     ok = false;
   }
 
   if (!urlRegex.test(local.UrlAdmin)) {
-    errors.UrlAdmin.push("URL Admin invalida.");
+    errors.UrlAdmin.push("Invalid Admin URL.");
     ok = false;
   }
 
   if (!urlRegex.test(local.UrlDashboard)) {
-    errors.UrlDashboard.push("URL Dashboard invalida.");
+    errors.UrlDashboard.push("Invalid Dashboard URL.");
     ok = false;
   }
 
   if (!pathRegex.test(local.settings.httpAdminRoot)) {
-    errors.httpAdminRoot.push("Deve iniciar com '/'.");
+    errors.httpAdminRoot.push("Must start with '/'.");
     ok = false;
   }
 
   if (!pathRegex.test(local.settings.httpNodeRoot)) {
-    errors.httpNodeRoot.push("Deve iniciar com '/'.");
+    errors.httpNodeRoot.push("Must start with '/'.");
     ok = false;
   }
 
   if (!fileNameRegex.test(local.settings.flowFile)) {
-    errors.flowFile.push("Nome de arquivo invalido.");
+    errors.flowFile.push("Invalid file name.");
     ok = false;
   }
 
   if (!fileNameRegex.test(local.settings.StaticFolder)) {
-    errors.StaticFolder.push("Nome de pasta invalido.");
+    errors.StaticFolder.push("Invalid folder name.");
     ok = false;
   }
 
   if (!local.settings.editorTheme.page.title.trim()) {
-    errors.adminTitle.push("Titulo nao pode estar vazio.");
+    errors.adminTitle.push("Title cannot be empty.");
     ok = false;
   }
 
   if (local.settings.https.key && !fileNameRegex.test(local.settings.https.key)) {
-    errors.httpsKey.push("Nome de arquivo invalido.");
+    errors.httpsKey.push("Invalid file name.");
     ok = false;
   }
 
   if (local.settings.https.cert && !fileNameRegex.test(local.settings.https.cert)) {
-    errors.httpsCert.push("Nome de arquivo invalido.");
+    errors.httpsCert.push("Invalid file name.");
     ok = false;
   }
 
+  if (local.adminAuth) {
+    if (!Array.isArray(local.settings.adminAuth.users) || local.settings.adminAuth.users.length === 0) {
+      errors.user.push("Provide at least one user.");
+      ok = false;
+    } else {
+      const normalizedUsernames = new Set();
+      const usernameIndexMap = new Map();
+      let hasDuplicateUsernames = false;
+
+      local.settings.adminAuth.users.forEach((user, index) => {
+        const username = String(user.username ?? "").trim();
+        const normalizedUsername = username.toLowerCase();
+
+        if (!username) {
+          errors.user.push(`User ${index + 1} cannot be empty.`);
+          ok = false;
+        } else if (normalizedUsernames.has(normalizedUsername)) {
+          const indices = usernameIndexMap.get(normalizedUsername) || [];
+          indices.push(index);
+          usernameIndexMap.set(normalizedUsername, indices);
+        } else {
+          normalizedUsernames.add(normalizedUsername);
+          usernameIndexMap.set(normalizedUsername, [index]);
+        }
+
+        if (!String(user.password ?? "").trim()) {
+          errors.password.push(`Password ${index + 1} cannot be empty.`);
+          ok = false;
+        }
+      });
+
+      usernameIndexMap.forEach((indices) => {
+        if (indices.length > 1) {
+          hasDuplicateUsernames = true;
+          ok = false;
+          indices.forEach((index) => {
+            errors.user.push(`User ${index + 1} has a duplicate username.`);
+          });
+        }
+      });
+
+      if (hasDuplicateUsernames) {
+        notify.error("Duplicate usernames are not allowed.");
+      }
+    }
+  }
+
   if (!ok) {
-    notify.error("Existem erros no formulario. Verifique os campos.");
+    if (!errors.user.some((message) => message.includes("has a duplicate username."))) {
+      notify.error("There are errors in the form. Check the fields.");
+    }
   }
 
   return ok;
@@ -446,12 +519,12 @@ async function onSave() {
   }
 
   if (payloadAddProject.status === false) {
-    notify.error("Erro ao salvar o projeto.");
+    notify.error(payloadAddProject.message || "Failed to save project.");
     return;
   }
 
   if (payloadAddProject.status === true) {
-    notify.success("Projeto salvo com sucesso!");
+    notify.success("Project saved successfully");
     visible.value = false;
   }
 }
@@ -539,7 +612,7 @@ async function fetchProjectLogs() {
 
   projectLogText.value = "";
   logFileName.value = "";
-  logError.value = payload?.error || "Erro ao carregar logs.";
+  logError.value = payload?.error || "Error loading logs.";
 }
 
 async function scrollLogToBottom() {
