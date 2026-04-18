@@ -5,30 +5,31 @@
     </v-card-title> -->
     <!-- 🔹 BARRA DE AÇÕES -->
     <div class="table-actions">
-      <v-btn  size="small" class="btn-small mx-1" color="green" @click="startSelected()">
-        <v-icon  left>mdi-play</v-icon>
+      <v-btn size="small" class="btn-small mx-1" color="green" @click="startSelected()">
+        <v-icon left>mdi-play</v-icon>
         start
       </v-btn>
 
-      <v-btn  size="small" class="btn-small mx-1" color="red" @click="stopSelected()">
+      <v-btn size="small" class="btn-small mx-1" color="red" @click="stopSelected()">
         <v-icon left>mdi-stop</v-icon>
         stop
       </v-btn>
 
-      <v-text-field
-        v-model="search"
-        label="search"
-        density="compact"
-        variant="outlined"
-        hide-details
-        clearable
-        class="search-field mx-1"
-      />
+      <v-text-field v-model="search" label="search" density="compact" variant="outlined" hide-details clearable
+        class="search-field mx-1" />
+    </div>
+
+       <div class="actions-row">
+      <v-spacer />
+      <v-btn size="small" color="grey" class="mt-3" @click="openNewProject">
+        <v-icon left>mdi-plus</v-icon>
+        New Project
+      </v-btn>
     </div>
 
     <div class="table-wrapper">
       <v-data-table :items="projects" :headers="headers" :search="search" class="elevation-1 fixed-table" item-key="id"
-        hide-default-footer>
+        :items-per-page="-1" hide-default-footer>
 
         <!-- ✅ HEADER DO CHECKBOX -->
         <template #header.select>
@@ -48,8 +49,7 @@
             {{ item.name }}
             <v-icon v-if="item.adminAuth" size="16" class="ml-2 name-icon"
               title="Security enabled">mdi-shield-lock</v-icon>
-            <v-icon v-if="item.autoStart" size="16" class="ml-1 name-icon"
-              title="Auto start">mdi-play</v-icon>
+            <v-icon v-if="item.autoStart" size="16" class="ml-1 name-icon" title="Auto start">mdi-play</v-icon>
             <v-icon v-if="item.settings?.https?.enabled" size="16" class="ml-1 name-icon"
               title="HTTPS enabled">mdi-lock</v-icon>
             <v-icon v-if="item.settings?.editorTheme?.projects?.enabled" size="16" class="ml-1 name-icon"
@@ -64,17 +64,11 @@
         </template>
 
 
-        
+
       </v-data-table>
     </div>
 
-    <div class="actions-row">
-      <v-spacer />
-      <v-btn  size="small"  color="grey" class="mt-3" @click="openNewProject">
-        <v-icon left>mdi-plus</v-icon>
-        New Project
-      </v-btn>
-    </div>
+ 
   </v-card>
 
   <!-- Dialog de edição -->
@@ -358,7 +352,3 @@ function toggleAll(value) {
   max-width: 280px;
 }
 </style>
-
-
-
-
