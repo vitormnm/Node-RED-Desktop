@@ -20,10 +20,10 @@
     "@mdi/font": "7.4.47"
   },
   "devDependencies": {
-    "@electron/packager": "19.0.1",
+    "@electron/packager": "20.0.1",
     "@vitejs/plugin-vue": "6.0.1",
-    "electron": "41.2.1",
-    "concurrently": "9.2.1",
+    "electron": "42.4.0",
+    "concurrently": "10.0.3",
     "cross-env": "10.1.0",
     "unplugin-fonts": "1.4.0",
     "vite": "7.3.2",

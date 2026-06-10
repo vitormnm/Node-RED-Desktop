@@ -2,9 +2,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Node-Red-Desktop2"
-#define MyAppVersion "4.1.1"
+#define MyAppVersion "5.0"
 #define MyAppPublisher "vitor miao"
-#define MyAppURL "https://www.vitormiao.com/"
+#define MyAppURL "https://vitormiao.com/"
 #define MyAppExeName "NodeRedDesktop.exe"
 #define MyAppAssocName "Node-Red-Desktop2"
 #define MyAppAssocExt ".exe"
@@ -37,7 +37,7 @@ ChangesAssociations=yes
 DisableProgramGroupPage=false
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputBaseFilename=Node-Red-4.1.1-Desktop-2.0
+OutputBaseFilename=Node-Red-5-Desktop-2.2
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -55,7 +55,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "D:\github\Node-RED-Desktop\build\NodeRedDesktop-win32-x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\github\Node-RED-Desktop\build\NodeRedDesktop-win32-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\github\Node-RED-Desktop\build\node-v22.12.0-x64.msi"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\github\Node-RED-Desktop\build\node-v24.16.0-x64.msi"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]
@@ -87,7 +87,7 @@ begin
     if not DirExists(ExpandConstant('{pf}\nodejs')) then begin
       //MsgBox('Node.js not found. Installing...', mbInformation, MB_OK);
       Exec(ExpandConstant('{sys}\msiexec.exe'),
-           '/i "' + ExpandConstant('{app}\node-v22.12.0-x64.msi') + '" /qn /norestart',
+           '/i "' + ExpandConstant('{app}\node-v24.16.0-x64.msi') + '" /qn /norestart',
            '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
     end else begin
       Log('Node-red-desktop Node.js is already installed');

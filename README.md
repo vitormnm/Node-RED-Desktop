@@ -28,6 +28,10 @@ Build 64 bits
 ```bash
   npm run build64
 ```
+### Support the development of this project and others if you found it useful.
+<a href="https://buymeacoffee.com/vitormnm">
+    <img src="./resources/bmc-button.svg" alt="Logo" width="200">
+</a>
 
 ## author
 
