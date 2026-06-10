@@ -62,8 +62,8 @@ class Settings_file {
     try {
       const data = await fs.readFile(filePath, { encoding: 'utf8' });
       const result = JSON.parse(data);
-     
-      return  result
+
+      return result
     } catch (err) {
       Logger.info("create default settings.json: " + err);
       const exists = await this.checkFile(filePath);
@@ -174,6 +174,11 @@ class Settings_file {
               telemetry: {
                 enabled: false,
                 updateNotification: false
+              },
+              contextStorage: {
+                default: "memoryOnly",
+                memoryOnly: { module: 'memory' },
+                file: { module: 'localfilesystem' }
               }
             }
           }

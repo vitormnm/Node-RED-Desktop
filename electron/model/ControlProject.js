@@ -65,11 +65,11 @@ class ControlProject {
                     "name": iPayload.name,
                     "id": id,
                     "description": iPayload.description ?? "",
-                    "uiPort":  parseInt(iPayload.uiPort) ,
+                    "uiPort": parseInt(iPayload.uiPort),
                     "autoStart": iPayload.autoStart,
                     "UrlAdmin": iPayload.UrlAdmin,
                     "UrlDashboard": iPayload.UrlDashboard,
-                    "adminAuth" : iPayload.adminAuth,
+                    "adminAuth": iPayload.adminAuth,
                     "settings": {
                         "flowFile": iPayload.settings.flowFile,
                         "httpAdminRoot": iPayload.settings.httpAdminRoot,
@@ -100,6 +100,11 @@ class ControlProject {
                         "telemetry": {
                             "enabled": iPayload.settings.telemetry.enabled,
                             "updateNotification": iPayload.settings.telemetry.updateNotification
+                        },
+                        "contextStorage": {
+                            "default": "memoryOnly",
+                            "memoryOnly": { module: 'memory' },
+                            "file": { module: 'localfilesystem' }
                         }
                     }
                 }
@@ -160,7 +165,7 @@ class ControlProject {
                 "autoStart": iPayload.autoStart,
                 "UrlAdmin": iPayload.UrlAdmin,
                 "UrlDashboard": iPayload.UrlDashboard,
-                "adminAuth" : iPayload.adminAuth,
+                "adminAuth": iPayload.adminAuth,
                 "settings": {
                     "flowFile": iPayload.settings.flowFile,
                     "httpAdminRoot": iPayload.settings.httpAdminRoot,
