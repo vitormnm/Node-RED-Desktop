@@ -125,7 +125,7 @@ class ControlProject {
             }
 
             BrowserWindow.getAllWindows().forEach(win => {
-                win.webContents.send("ctl_serverConfig_uploadProject_msg", { texto: 'regresh' });
+                win.webContents.send("ctl_serverConfig_uploadProject_msg", { texto: 'refresh' });
             });
 
             return result
@@ -217,11 +217,11 @@ class ControlProject {
 
             settings_file.projects[index_update] = newProject
 
-            Settings_file.WriteFile(settings_file);
+            await Settings_file.WriteFile(settings_file);
             Logger.info(`${iPayload.name} update`)
 
             BrowserWindow.getAllWindows().forEach(win => {
-                win.webContents.send("ctl_serverConfig_uploadProject_msg", { texto: 'regresh' });
+                win.webContents.send("ctl_serverConfig_uploadProject_msg", { texto: 'refresh' });
             });
             return { "status": true }
 
@@ -263,7 +263,7 @@ class ControlProject {
             Logger.info(`${iPayload.name} delete`)
 
             BrowserWindow.getAllWindows().forEach(win => {
-                win.webContents.send("ctl_serverConfig_uploadProject_msg", { texto: 'regresh' });
+                win.webContents.send("ctl_serverConfig_uploadProject_msg", { texto: 'refresh' });
             });
             return { "status": true }
 
