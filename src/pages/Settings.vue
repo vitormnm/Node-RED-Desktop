@@ -132,18 +132,18 @@ function validate() {
   let ok = true;
 
   if (!settingsJson.app.startupProjectWindow.id) {
-    errors.project.push("Selecione um projeto.");
+    errors.project.push("Select a project.");
     ok = false;
   }
 
   if (!settingsJson.app.startupProjectWindow.url?.trim()) {
-    errors.url.push("URL não pode estar vazia.");
+    errors.url.push("The URL cannot be empty.");
     ok = false;
   }
 
   const ipRegex = /^(?:\d{1,3}\.){3}\d{1,3}$/;
   if (settingsJson.redundancy.enabled && !ipRegex.test(settingsJson.redundancy.ip)) {
-    errors.ip.push("IP inválido.");
+    errors.ip.push("Invalid IP address.");
     ok = false;
   }
 
@@ -160,7 +160,7 @@ function validate() {
 }
 
 // -----------------------------
-// SALVAR
+// save
 // -----------------------------
 async function save() {
   if (!validate()) return;
@@ -169,9 +169,9 @@ async function save() {
   const result = await window.api.post("/ctl_serverConfig_settings_save", updated);
 
   if (result.status == true) {
-    notify.success("Configurações salvas")
+    notify.success("Saved settings")
   } else {
-    notify.error("Erro ao salvar");
+    notify.error("error while saving");
   }
 
 

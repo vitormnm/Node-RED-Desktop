@@ -12,7 +12,7 @@
       {{ logError }}
     </v-alert>
 
-    <pre ref="logContentRef" class="log-content" @scroll="onScroll">{{ projectLogText || "Sem logs para este projeto." }}</pre>
+    <pre ref="logContentRef" class="log-content" @scroll="onScroll">{{ projectLogText || "No logs for this project." }}</pre>
   </section>
 </template>
 

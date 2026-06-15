@@ -9,7 +9,8 @@
     "dev": "cross-env NODE_ENV=dev concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "build": "vite build",
     "preview": "vite preview",
-    "build64": "npm run build && electron-packager . NodeRedDesktop --icon=./electron/resources/nodered.ico --platform=win32 --arch=x64 --out=build --asar --overwrite --win32metadata.CompanyName=VitorMiao --win32metadata.ProductName='Node-RED-Desktop' --prune=true --ignore=\"^/(src|node_modules/(vue|vite|vue-router))\" && xcopy WinSW build\\NodeRedDesktop-win32-x64\\WinSW\\ /E /I /Y"
+    "build64": "npm run build && electron-packager . NodeRedDesktop --icon=./electron/resources/nodered.ico --platform=win32 --arch=x64 --out=build --asar --overwrite --win32metadata.CompanyName=VitorMiao --win32metadata.ProductName='Node-RED-Desktop' --prune=true --ignore=\"^/(src|node_modules/(vue|vite|vue-router))\" && xcopy WinSW build\\NodeRedDesktop-win32-x64\\WinSW\\ /E /I /Y",
+    "build64linux": "npm run build && electron-packager . NodeRedDesktop --icon=./electron/resources/nodered.ico --platform=linux --arch=x64 --out=build --asar --overwrite --win32metadata.CompanyName=VitorMiao --win32metadata.ProductName='Node-RED-Desktop' --prune=true --ignore=\"^/(src|node_modules/(vue|vite|vue-router))\" && xcopy WinSW build\\NodeRedDesktop-win32-x64\\WinSW\\ /E /I /Y"
   },
   "dependencies": {
     "node-red": "5.0.0",
