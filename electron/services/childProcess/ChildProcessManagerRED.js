@@ -20,6 +20,10 @@ class ChildProcessManagerRED {
   #child_process = [];
   #initStartupProjectWindow = true;
 
+  // Restart back-off config
+  #MAX_RETRIES = 5;
+  #BASE_DELAY_MS = 2000;
+
   constructor() { }
 
   // inicia todos os workers
@@ -103,9 +107,25 @@ class ChildProcessManagerRED {
       });
 
       child.on('error', (err) => {
-        Logger.error(`Error fork Node-RED: ${iName} - ${iID}`);
-        // tenta reiniciar
-        this.#startWorkerNoderRED(iProject, iID, iName);
+        Logger.error(`Error fork Node-RED: ${iName} - ${iID}. ${err}`);
+
+        const entry = this.#child_process.find(e => e.id === iID);
+        if (!entry) return;
+
+        if (entry.retryCount >= this.#MAX_RETRIES) {
+          Logger.error(`${iName}: max retries (${this.#MAX_RETRIES}) reached — giving up. Fix the project config and start it manually.`);
+          this.#deleteForkLsit(iName);
+          return;
+        }
+
+        const delay = Math.min(this.#BASE_DELAY_MS * 2 ** entry.retryCount, 60_000);
+        entry.retryCount++;
+
+        Logger.info(`${iName}: restarting in ${delay}ms (attempt ${entry.retryCount}/${this.#MAX_RETRIES})`);
+        entry.retryTimer = setTimeout(() => {
+          entry.retryTimer = null;
+          this.#startWorkerNoderRED(iProject, iID, iName);
+        }, delay);
       });
 
       this.#child_process.push({
@@ -116,7 +136,9 @@ class ChildProcessManagerRED {
         rssBytes: null,
         cpuPercent: null,
         diskReadBytesPerSec: null,
-        diskWriteBytesPerSec: null
+        diskWriteBytesPerSec: null,
+        retryCount: 0,
+        retryTimer: null
       });
 
     } catch (err) {
@@ -151,6 +173,10 @@ class ChildProcessManagerRED {
         }
         if (payload.diskWriteBytesPerSec !== undefined) {
           element.diskWriteBytesPerSec = payload.diskWriteBytesPerSec;
+        }
+        // Reset back-off counter on a successful start
+        if (payload.cmd === 'started') {
+          element.retryCount = 0;
         }
       }
     });
@@ -193,6 +219,11 @@ class ChildProcessManagerRED {
     this.#child_process.forEach(async (element) => {
       if (element.name == iName) {
         index_delete = index;
+        // Cancel any pending back-off timer before removing
+        if (element.retryTimer) {
+          clearTimeout(element.retryTimer);
+          element.retryTimer = null;
+        }
         this.#child_process.splice(index_delete, 1);
       }
       index++;
