@@ -93,17 +93,20 @@ var projects = ref([]);
 const selected = ref([]);
 const search = ref("");
 
+let renderTimer = null;
 
 onMounted(async () => {
-
   renderTable();
-  setInterval(() => {
+  renderTimer = setInterval(() => {
     renderTable();
   }, 1000);
 });
 
 onUnmounted(() => {
-
+  if (renderTimer) {
+    clearInterval(renderTimer);
+    renderTimer = null;
+  }
 });
 
 // ---------- CONTROLE DO DELETE MODAL ----------

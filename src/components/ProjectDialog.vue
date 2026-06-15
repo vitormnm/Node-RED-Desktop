@@ -140,7 +140,7 @@ const dialogTitle = computed(() => {
 });
 const isProjectRunning = computed(() => local.projectsStatus?.text === "running");
 const isPreviewPanel = computed(
-  () => props.submitType === "update" && (activePanel.value === "editor" || activePanel.value === "dashboard")
+  () => props.submitType === "update" && (activePanel.value === "editor" || activePanel.value === "dashboard" || activePanel.value === "log")
 );
 const dialogWidth = computed(() => (isPreviewPanel.value ? "calc(100vw - 32px)" : null));
 const dialogMaxWidth = computed(() => (isPreviewPanel.value ? "calc(100vw - 32px)" : 980));
