@@ -233,7 +233,7 @@ All channels are registered in [`electron/ipc-handlers/project.js`](electron/ipc
 
 | Event | Payload | Trigger |
 |---|---|---|
-| `ctl_serverConfig_uploadProject_msg` | `{ texto: 'regresh' }` | Sent to all `BrowserWindow`s after any project add/update/delete to trigger a UI refresh |
+| `ctl_serverConfig_uploadProject_msg` | `{ texto: 'refresh' }` | Sent to all `BrowserWindow`s after any project add/update/delete to trigger a UI refresh |
 
 ---
 
