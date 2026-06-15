@@ -123,7 +123,7 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, watch } from "vue";
 
 const permissionOptions = [
   { title: "Admin", value: "*" },
@@ -206,6 +206,23 @@ function getPasswordMessages(index) {
 function userHasError(index) {
   return getUserMessages(index).length > 0 || getPasswordMessages(index).length > 0;
 }
+
+// Replace the port number in a URL string with a new port.
+function replacePortInUrl(url, newPort) {
+  if (!url) return url;
+  // Matches the port in http(s)://host:PORT/... or http(s)://host/...
+  return url.replace(/(https?:\/\/[^/:]+)(:\d+)?(\/|$)/, `$1:${newPort}$3`);
+}
+
+watch(
+  () => props.local.uiPort,
+  (newPort) => {
+    const port = parseInt(newPort);
+    if (!port || port <= 0) return;
+    props.local.UrlAdmin = replacePortInUrl(props.local.UrlAdmin, port);
+    props.local.UrlDashboard = replacePortInUrl(props.local.UrlDashboard, port);
+  }
+);
 
 </script>
 
