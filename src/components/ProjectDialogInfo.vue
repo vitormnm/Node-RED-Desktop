@@ -1,21 +1,16 @@
 <template>
   <section class="info-panel">
 
-    <!-- ── Status bar ── -->
+    <!-- ── Status bar (compact, no icons) ── -->
     <div class="status-bar">
-      <v-chip
-        class="status-chip"
-        :color="projectsStatus.color"
-        text-color="white"
-        size="small"
-        label
-      >
-        <v-icon start size="14">
-          {{ projectsStatus.text === 'running' ? 'mdi-circle' : projectsStatus.text === 'starting' ? 'mdi-timer-sand' : 'mdi-circle-off-outline' }}
-        </v-icon>
+      <v-chip :color="projectsStatus.color" size="x-small" label class="status-chip">
         {{ projectsStatus.text }}
-        <span v-if="projectsStatus.pid" class="pid-label">&nbsp;· PID {{ projectsStatus.pid }}</span>
       </v-chip>
+      <span class="status-meta" v-if="projectsStatus.pid">PID {{ projectsStatus.pid }}</span>
+      <span class="status-meta">RAM {{ formatRam(projectsStatus.ramBytes) }}</span>
+      <span class="status-meta">CPU {{ formatCpu(projectsStatus.cpuPercent) }}</span>
+      <span class="status-meta">↓ {{ formatRate(projectsStatus.diskReadBytesPerSec) }}</span>
+      <span class="status-meta">↑ {{ formatRate(projectsStatus.diskWriteBytesPerSec) }}</span>
     </div>
 
     <!-- ── Metric cards ── -->
@@ -31,12 +26,12 @@
         <div class="metric-label">CPU</div>
       </div>
       <div class="metric-card">
-        <v-icon class="metric-icon" color="teal-lighten-2">mdi-harddisk</v-icon>
+        <v-icon class="metric-icon" color="teal-lighten-2">mdi-arrow-down-bold</v-icon>
         <div class="metric-value">{{ formatRate(projectsStatus.diskReadBytesPerSec) }}</div>
         <div class="metric-label">Disk Read</div>
       </div>
       <div class="metric-card">
-        <v-icon class="metric-icon" color="orange-lighten-2">mdi-harddisk</v-icon>
+        <v-icon class="metric-icon" color="orange-lighten-2">mdi-arrow-up-bold</v-icon>
         <div class="metric-value">{{ formatRate(projectsStatus.diskWriteBytesPerSec) }}</div>
         <div class="metric-label">Disk Write</div>
       </div>
@@ -50,21 +45,18 @@
       <div class="action-row">
         <v-btn
           class="action-btn"
-          size="small"
           color="green"
           prepend-icon="mdi-play"
           @click="emit('open-action', 'start_project')"
         >Start</v-btn>
         <v-btn
           class="action-btn"
-          size="small"
           color="red"
           prepend-icon="mdi-stop"
           @click="emit('open-action', 'stop_project')"
         >Stop</v-btn>
         <v-btn
           class="action-btn"
-          size="small"
           color="grey"
           prepend-icon="mdi-folder-open"
           @click="emit('open-action', 'open_folder')"
@@ -78,7 +70,6 @@
     <div class="action-group">
       <div class="action-group-label">Open</div>
 
-      <!-- Fullscreen toggle -->
       <v-checkbox
         v-model="fullscreen"
         label="Open local window in fullscreen"
@@ -88,17 +79,14 @@
       />
 
       <div class="action-row">
-        <!-- mdi-monitor = local / mdi-open-in-new = web -->
         <v-btn
           class="action-btn"
-          size="small"
           color="indigo"
           prepend-icon="mdi-monitor"
           @click="emit('open-action', 'open_editor', fullscreen)"
         >Editor local</v-btn>
         <v-btn
           class="action-btn"
-          size="small"
           color="indigo"
           variant="outlined"
           prepend-icon="mdi-open-in-new"
@@ -109,14 +97,12 @@
       <div class="action-row mt-2">
         <v-btn
           class="action-btn"
-          size="small"
           color="cyan-darken-1"
           prepend-icon="mdi-monitor"
           @click="emit('open-action', 'open_dashboard', fullscreen)"
         >Dashboard local</v-btn>
         <v-btn
           class="action-btn"
-          size="small"
           color="cyan-darken-1"
           variant="outlined"
           prepend-icon="mdi-open-in-new"
@@ -125,16 +111,14 @@
       </div>
     </div>
 
-    <!-- ── Delete (no section title) ── -->
+    <!-- ── Delete ── -->
     <template v-if="submitLabel === 'Update'">
       <v-divider class="my-4" />
       <div class="action-row">
         <v-btn
           class="action-btn"
-          size="small"
-          color="red-darken-3"
-          variant="outlined"
-          prepend-icon="mdi-delete-forever"
+          color="red"
+          prepend-icon="mdi-trash-can"
           @click="emit('confirm-delete')"
         >Delete Project</v-btn>
       </div>
@@ -185,20 +169,21 @@ function formatRate(bytesPerSec) {
   padding: 4px 0;
 }
 
-/* ── Status bar ── */
+/* ── Status bar — compact single line ── */
 .status-bar {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 .status-chip {
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.03em;
 }
-.pid-label {
-  opacity: 0.75;
-  font-size: 0.8em;
+.status-meta {
+  font-size: 0.75rem;
+  opacity: 0.55;
 }
 
 /* ── Metric grid ── */
@@ -257,13 +242,14 @@ function formatRate(bytesPerSec) {
   margin-bottom: 4px;
 }
 
-/* All action buttons share the same fixed width */
+/* Uniform button size — slightly larger than before */
 .action-row {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 .action-btn {
-  width: 148px;
+  width: 160px;
+  min-height: 36px;
 }
 </style>
