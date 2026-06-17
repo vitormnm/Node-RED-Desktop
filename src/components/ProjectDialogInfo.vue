@@ -49,18 +49,21 @@
       <div class="action-group-label">Worker</div>
       <div class="action-row">
         <v-btn
+          class="action-btn"
           size="small"
           color="green"
           prepend-icon="mdi-play"
           @click="emit('open-action', 'start_project')"
         >Start</v-btn>
         <v-btn
+          class="action-btn"
           size="small"
           color="red"
           prepend-icon="mdi-stop"
           @click="emit('open-action', 'stop_project')"
         >Stop</v-btn>
         <v-btn
+          class="action-btn"
           size="small"
           color="grey"
           prepend-icon="mdi-folder-open"
@@ -85,49 +88,55 @@
       />
 
       <div class="action-row">
+        <!-- mdi-monitor = local / mdi-open-in-new = web -->
         <v-btn
+          class="action-btn"
           size="small"
           color="indigo"
-          prepend-icon="mdi-pencil-box"
+          prepend-icon="mdi-monitor"
           @click="emit('open-action', 'open_editor', fullscreen)"
         >Editor local</v-btn>
         <v-btn
+          class="action-btn"
           size="small"
-          color="indigo-lighten-3"
+          color="indigo"
+          variant="outlined"
           prepend-icon="mdi-open-in-new"
           @click="emit('open-action', 'open_editor_web', false)"
         >Editor web</v-btn>
       </div>
+
       <div class="action-row mt-2">
         <v-btn
+          class="action-btn"
           size="small"
           color="cyan-darken-1"
-          prepend-icon="mdi-view-dashboard"
+          prepend-icon="mdi-monitor"
           @click="emit('open-action', 'open_dashboard', fullscreen)"
         >Dashboard local</v-btn>
         <v-btn
+          class="action-btn"
           size="small"
-          color="cyan-lighten-3"
+          color="cyan-darken-1"
+          variant="outlined"
           prepend-icon="mdi-open-in-new"
           @click="emit('open-action', 'open_dashboard_web', false)"
         >Dashboard web</v-btn>
       </div>
     </div>
 
-    <!-- ── Danger zone ── -->
+    <!-- ── Delete (no section title) ── -->
     <template v-if="submitLabel === 'Update'">
       <v-divider class="my-4" />
-      <div class="action-group">
-        <div class="action-group-label danger-label">Danger Zone</div>
-        <div class="action-row">
-          <v-btn
-            size="small"
-            color="red-darken-3"
-            variant="outlined"
-            prepend-icon="mdi-delete-forever"
-            @click="emit('confirm-delete')"
-          >Delete Project</v-btn>
-        </div>
+      <div class="action-row">
+        <v-btn
+          class="action-btn"
+          size="small"
+          color="red-darken-3"
+          variant="outlined"
+          prepend-icon="mdi-delete-forever"
+          @click="emit('confirm-delete')"
+        >Delete Project</v-btn>
       </div>
     </template>
 
@@ -247,13 +256,14 @@ function formatRate(bytesPerSec) {
   opacity: 0.5;
   margin-bottom: 4px;
 }
-.danger-label {
-  color: #ef5350;
-  opacity: 0.85;
-}
+
+/* All action buttons share the same fixed width */
 .action-row {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+.action-btn {
+  width: 148px;
 }
 </style>

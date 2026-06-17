@@ -14,28 +14,33 @@ class ElectronWindow {
     constructor() {
 
     }
-    BrowserWindowURL(iURL, iFullScreen, iConfig) {
-         const winde = new BrowserWindow(iConfig)
+    BrowserWindowURL(iURL, iFullScreen = false, iConfig = {}) {
+        const defaultConfig = {
+            width: 1280,
+            height: 800,
+            show: false,
+            webPreferences: {
+                nodeIntegration: false,
+                contextIsolation: true,
+            },
+        };
+
+        const winde = new BrowserWindow({ ...defaultConfig, ...iConfig });
+
+        winde.once('ready-to-show', () => {
+            if (iFullScreen) {
+                winde.setFullScreen(true);
+            } else {
+                winde.maximize();
+            }
+            winde.show();
+        });
+
         if (this.#isDev) {
-            winde.webContents.openDevTools()
-
-        }
-       
-        // Load a remote URL
-
-        if (iFullScreen == true) {
-
-            winde.setFullScreen(true);
+            winde.webContents.openDevTools();
         }
 
-        if (this.#isDev) {
-            winde.webContents.openDevTools()
-        }
-
-
-        winde.loadURL(iURL)
-        winde.maximize()
-
+        winde.loadURL(iURL);
 
         // Captures when the page attempts to prevent unloading
         winde.webContents.on("will-prevent-unload", (event) => {
@@ -50,8 +55,6 @@ class ElectronWindow {
                 winde.destroy();
             }
         });
-
-
     }
 
     async BrowserWindow(iConfig, iFile , iFileParameter) {
