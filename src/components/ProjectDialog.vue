@@ -463,7 +463,7 @@ async function validate() {
   return ok;
 }
 
-function onButtonOpenEditor(action) {
+function onButtonOpenEditor(action, fullscreen = false) {
   if (action === "start_project") {
     window.api.post("/ctl_project_startWoker", { id: local.id, name: local.name });
     return;
@@ -476,7 +476,8 @@ function onButtonOpenEditor(action) {
 
   const payload = {
     action,
-    id: local.id
+    id: local.id,
+    fullscreen: Boolean(fullscreen)
   };
   window.api.post("/ctl_project_windows_openEditor", payload);
 }

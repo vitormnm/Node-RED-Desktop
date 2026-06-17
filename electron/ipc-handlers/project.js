@@ -34,7 +34,7 @@ export function registerProjectRoutes() {
   })
 
   ipcMain.handle('POST:/ctl_project_windows_openEditor', async (event, data) => {
-    Project_openElectronWindow.setActionOpen(data.action, data.id)
+    Project_openElectronWindow.setActionOpen(data.action, data.id, data.fullscreen ?? false)
   })
 
 
