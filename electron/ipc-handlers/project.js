@@ -1,4 +1,4 @@
-import { ipcMain, BrowserWindow } from 'electron';
+import { ipcMain, BrowserWindow, app } from 'electron';
 
 import ChildProcessManagerRED from "../services/childProcess/ChildProcessManagerRED.js";
 import ControlProject from "../model/ControlProject.js";
@@ -15,7 +15,7 @@ export function registerProjectRoutes() {
 
 
   ipcMain.handle('DELETE:/projects/:id', async (_, { id }) => {
-    console.log("delete project", id);
+    
     return { deleted: true };
   });
 
@@ -23,7 +23,11 @@ export function registerProjectRoutes() {
 
   //Read full config.json file
   ipcMain.handle('GET:/checkSettings', async (event, data) => {
-    return await Settings_file.getFile();
+    const settings = await Settings_file.getFile();
+    return {
+      ...settings,
+      appVersion: app.getVersion()
+    };
   })
 
 
@@ -54,7 +58,7 @@ export function registerProjectRoutes() {
 
   //Read full config.json file
   ipcMain.handle('PUT:/ctl_project_updateProject', async (event, data) => {
-    console.log("PUT:/ctl_project_updateProject")
+    
     return await ControlProject.update(data);
   })
 

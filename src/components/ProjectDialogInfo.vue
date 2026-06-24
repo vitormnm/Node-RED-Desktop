@@ -1,37 +1,31 @@
 <template>
   <section class="info-panel">
 
-    <!-- ── Status bar (compact, no icons) ── -->
-    <div class="status-bar">
-      <v-chip :color="projectsStatus.color" size="x-small" label class="status-chip">
-        {{ projectsStatus.text }}
-      </v-chip>
-      <span class="status-meta" v-if="projectsStatus.pid">PID {{ projectsStatus.pid }}</span>
-      <span class="status-meta">RAM {{ formatRam(projectsStatus.ramBytes) }}</span>
-      <span class="status-meta">CPU {{ formatCpu(projectsStatus.cpuPercent) }}</span>
-      <span class="status-meta">↓ {{ formatRate(projectsStatus.diskReadBytesPerSec) }}</span>
-      <span class="status-meta">↑ {{ formatRate(projectsStatus.diskWriteBytesPerSec) }}</span>
-    </div>
-
     <!-- ── Metric cards ── -->
     <div class="metric-grid">
+      <!-- Status card -->
       <div class="metric-card">
-        <v-icon class="metric-icon" color="blue-lighten-2">mdi-memory</v-icon>
+        <div class="metric-value status-text" :style="{ color: projectsStatus.color }">{{ projectsStatus.text }}</div>
+        <div class="metric-label" v-if="projectsStatus.pid">PID {{ projectsStatus.pid }}</div>
+        <div class="metric-label" v-else>—</div>
+      </div>
+      <!-- RAM -->
+      <div class="metric-card">
         <div class="metric-value">{{ formatRam(projectsStatus.ramBytes) }}</div>
         <div class="metric-label">RAM</div>
       </div>
+      <!-- CPU -->
       <div class="metric-card">
-        <v-icon class="metric-icon" color="purple-lighten-2">mdi-cpu-64-bit</v-icon>
         <div class="metric-value">{{ formatCpu(projectsStatus.cpuPercent) }}</div>
         <div class="metric-label">CPU</div>
       </div>
+      <!-- Disk Read -->
       <div class="metric-card">
-        <v-icon class="metric-icon" color="teal-lighten-2">mdi-arrow-down-bold</v-icon>
         <div class="metric-value">{{ formatRate(projectsStatus.diskReadBytesPerSec) }}</div>
         <div class="metric-label">Disk Read</div>
       </div>
+      <!-- Disk Write -->
       <div class="metric-card">
-        <v-icon class="metric-icon" color="orange-lighten-2">mdi-arrow-up-bold</v-icon>
         <div class="metric-value">{{ formatRate(projectsStatus.diskWriteBytesPerSec) }}</div>
         <div class="metric-label">Disk Write</div>
       </div>
@@ -45,18 +39,21 @@
       <div class="action-row">
         <v-btn
           class="action-btn"
+          size="small"
           color="green"
           prepend-icon="mdi-play"
           @click="emit('open-action', 'start_project')"
         >Start</v-btn>
         <v-btn
           class="action-btn"
+          size="small"
           color="red"
           prepend-icon="mdi-stop"
           @click="emit('open-action', 'stop_project')"
         >Stop</v-btn>
         <v-btn
           class="action-btn"
+          size="small"
           color="grey"
           prepend-icon="mdi-folder-open"
           @click="emit('open-action', 'open_folder')"
@@ -81,30 +78,31 @@
       <div class="action-row">
         <v-btn
           class="action-btn"
-          color="indigo"
+          size="small"
+          color="grey"
           prepend-icon="mdi-monitor"
           @click="emit('open-action', 'open_editor', fullscreen)"
         >Editor local</v-btn>
         <v-btn
           class="action-btn"
-          color="indigo"
-          variant="outlined"
+          size="small"
+          color="grey"
           prepend-icon="mdi-open-in-new"
           @click="emit('open-action', 'open_editor_web', false)"
         >Editor web</v-btn>
       </div>
-
-      <div class="action-row mt-2">
+      <div class="action-row">
         <v-btn
           class="action-btn"
-          color="cyan-darken-1"
+          size="small"
+          color="grey"
           prepend-icon="mdi-monitor"
           @click="emit('open-action', 'open_dashboard', fullscreen)"
         >Dashboard local</v-btn>
         <v-btn
           class="action-btn"
-          color="cyan-darken-1"
-          variant="outlined"
+          size="small"
+          color="grey"
           prepend-icon="mdi-open-in-new"
           @click="emit('open-action', 'open_dashboard_web', false)"
         >Dashboard web</v-btn>
@@ -117,6 +115,7 @@
       <div class="action-row">
         <v-btn
           class="action-btn"
+          size="small"
           color="red"
           prepend-icon="mdi-trash-can"
           @click="emit('confirm-delete')"
@@ -169,27 +168,10 @@ function formatRate(bytesPerSec) {
   padding: 4px 0;
 }
 
-/* ── Status bar — compact single line ── */
-.status-bar {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-.status-chip {
-  font-weight: 700;
-  letter-spacing: 0.03em;
-}
-.status-meta {
-  font-size: 0.75rem;
-  opacity: 0.55;
-}
-
 /* ── Metric grid ── */
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 10px;
 }
 
@@ -204,16 +186,15 @@ function formatRate(bytesPerSec) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
-  padding: 12px 8px;
+  padding: 10px 8px;
   text-align: center;
 }
-.metric-icon {
-  font-size: 22px !important;
-  margin-bottom: 2px;
+.status-text {
+  text-transform: capitalize;
 }
 .metric-value {
   font-size: 1rem;
@@ -242,7 +223,7 @@ function formatRate(bytesPerSec) {
   margin-bottom: 4px;
 }
 
-/* Uniform button size — slightly larger than before */
+/* Buttons: Vuetify small size, width fixed so icons never get clipped */
 .action-row {
   display: flex;
   flex-wrap: wrap;
@@ -250,6 +231,5 @@ function formatRate(bytesPerSec) {
 }
 .action-btn {
   width: 160px;
-  min-height: 36px;
 }
 </style>

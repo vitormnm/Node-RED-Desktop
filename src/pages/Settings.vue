@@ -64,6 +64,11 @@
               </v-btn>
             </v-col>
           </v-row>
+
+          <v-divider class="my-6"></v-divider>
+          <div class="text-center text-caption text-grey">
+            Version: {{ appVersion }}
+          </div>
         </v-card>
       </v-col>
     </v-row>
@@ -73,6 +78,8 @@
 <script setup>
 import { reactive, onMounted, ref } from "vue";
 import { notify } from "@/utils/notify.js";
+
+const appVersion = ref("");
 
 // JSON base
 const settingsJson = reactive({
@@ -111,12 +118,14 @@ onMounted(async () => {
   const payload = await window.api.get("/checkSettings");
   renderProjects(payload);
   rendersettingsJson(payload);
+  appVersion.value = payload.appVersion || "";
 });
 
 // substitui JSON inteiro do settingsJson
 function rendersettingsJson(iPayload) {
-
- Object.assign(settingsJson, iPayload);
+  const cleanPayload = JSON.parse(JSON.stringify(iPayload));
+  delete cleanPayload.appVersion;
+  Object.assign(settingsJson, cleanPayload);
 }
 
 // renderiza projetos no select

@@ -50,6 +50,7 @@
             <v-icon v-if="item.adminAuth" size="16" class="ml-2 name-icon"
               title="Security enabled">mdi-shield-lock</v-icon>
             <v-icon v-if="item.autoStart" size="16" class="ml-1 name-icon" title="Auto start">mdi-play</v-icon>
+            <v-icon v-if="item.autoRestart" size="16" class="ml-1 name-icon" title="Auto restart">mdi-restart</v-icon>
             <v-icon v-if="item.settings?.https?.enabled" size="16" class="ml-1 name-icon"
               title="HTTPS enabled">mdi-lock</v-icon>
             <v-icon v-if="item.settings?.editorTheme?.projects?.enabled" size="16" class="ml-1 name-icon"

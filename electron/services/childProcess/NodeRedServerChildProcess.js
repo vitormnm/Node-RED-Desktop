@@ -65,7 +65,7 @@ import fs from 'fs';
       process.send(JSON.stringify(payload));
     } else {
       // fallback log if not running as child process
-      console.log('Child payload:', payload);
+      // console.log('Child payload:', payload);
     }
 
     // Periodic stats for the parent process to display

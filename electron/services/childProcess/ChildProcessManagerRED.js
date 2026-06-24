@@ -102,15 +102,23 @@ class ChildProcessManagerRED {
       });
 
       child.on('exit', (code, signal) => {
-        Logger.info(`Exit fork Node-RED: ${iName} - ${iID}`);
-        this.#deleteForkLsit(iName);
-      });
-
-      child.on('error', (err) => {
-        Logger.error(`Error fork Node-RED: ${iName} - ${iID}. ${err}`);
-
+        Logger.info(`Exit fork Node-RED: ${iName} - ${iID} with code ${code} and signal ${signal}`);
+        
         const entry = this.#child_process.find(e => e.id === iID);
-        if (!entry) return;
+        if (!entry) {
+          return;
+        }
+
+        entry.child_process = null;
+        entry.pid = null;
+        entry.rssBytes = null;
+        entry.cpuPercent = null;
+
+        if (iProject.autoRestart === false) {
+          Logger.error(`Exit fork Node-RED: ${iName} - ${iID} with code ${code} and signal ${signal}. autoRestart is disabled. Stopping project.`);
+          this.#deleteForkLsit(iName);
+          return;
+        }
 
         if (entry.retryCount >= this.#MAX_RETRIES) {
           Logger.error(`${iName}: max retries (${this.#MAX_RETRIES}) reached — giving up. Fix the project config and start it manually.`);
@@ -128,18 +136,32 @@ class ChildProcessManagerRED {
         }, delay);
       });
 
-      this.#child_process.push({
-        child_process: child,
-        id: iID,
-        name: iName,
-        pid: null,
-        rssBytes: null,
-        cpuPercent: null,
-        diskReadBytesPerSec: null,
-        diskWriteBytesPerSec: null,
-        retryCount: 0,
-        retryTimer: null
+      child.on('error', (err) => {
+        Logger.error(`Error fork Node-RED: ${iName} - ${iID}. ${err}`);
       });
+
+      const existingEntry = this.#child_process.find(e => e.id === iID);
+      if (existingEntry) {
+        existingEntry.child_process = child;
+        existingEntry.pid = null;
+        existingEntry.rssBytes = null;
+        existingEntry.cpuPercent = null;
+        existingEntry.diskReadBytesPerSec = null;
+        existingEntry.diskWriteBytesPerSec = null;
+      } else {
+        this.#child_process.push({
+          child_process: child,
+          id: iID,
+          name: iName,
+          pid: null,
+          rssBytes: null,
+          cpuPercent: null,
+          diskReadBytesPerSec: null,
+          diskWriteBytesPerSec: null,
+          retryCount: 0,
+          retryTimer: null
+        });
+      }
 
     } catch (err) {
       Logger.error(`error fork Node-RED: ${iName} - ${iID}. ${err}`);
@@ -206,7 +228,13 @@ class ChildProcessManagerRED {
     this.#child_process.forEach(async (element) => {
       if (element.id == iID) {
         index_delete = index;
-        await element.child_process.kill();
+        if (element.retryTimer) {
+          clearTimeout(element.retryTimer);
+          element.retryTimer = null;
+        }
+        if (element.child_process) {
+          await element.child_process.kill();
+        }
         this.#child_process.splice(index_delete, 1);
       }
       index++;

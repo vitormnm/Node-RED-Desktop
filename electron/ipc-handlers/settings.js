@@ -11,7 +11,7 @@ export function registerSettingsRoutes() {
 
   //Read full config.json file
   ipcMain.handle('POST:/ctl_serverConfig_settings_save', async (event, data) => {
-    console.log(data)
+    
     try {
       await AppSettings.set_RedudancySettings(data);
       await AppSettings.set_startupProjectWindow(data);

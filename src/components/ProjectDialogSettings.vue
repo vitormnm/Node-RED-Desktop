@@ -16,6 +16,7 @@
       <v-row>
         <v-col cols="12">
           <v-checkbox v-model="local.autoStart" label="Auto start" />
+          <v-checkbox v-model="local.autoRestart" label="Auto restart" />
           <v-checkbox v-model="local.settings.https.enabled" label="Enabled HTTPS" />
           <v-checkbox v-model="local.settings.editorTheme.projects.enabled" label="Enabled project (required git)" />
           <v-checkbox v-model="local.adminAuth" label="Enabled security" />

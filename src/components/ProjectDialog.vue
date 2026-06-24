@@ -142,8 +142,9 @@ const isProjectRunning = computed(() => local.projectsStatus?.text === "running"
 const isPreviewPanel = computed(
   () => props.submitType === "update" && (activePanel.value === "editor" || activePanel.value === "dashboard" || activePanel.value === "log")
 );
-const dialogWidth = computed(() => (isPreviewPanel.value ? "calc(100vw - 32px)" : null));
-const dialogMaxWidth = computed(() => (isPreviewPanel.value ? "calc(100vw - 32px)" : 980));
+// Dialog is always wide in update mode; only log/editor/dashboard go full-height
+const dialogWidth = computed(() => (props.submitType === "update" ? "calc(100vw - 32px)" : null));
+const dialogMaxWidth = computed(() => (props.submitType === "update" ? "calc(100vw - 32px)" : 980));
 
 const emit = defineEmits(["update:modelValue", "save"]);
 
@@ -178,6 +179,7 @@ const local = reactive({
   name: "",
   uiPort: null,
   autoStart: false,
+  autoRestart: true,
   UrlAdmin: "",
   UrlDashboard: "",
   adminAuth: false,
@@ -238,6 +240,9 @@ watch(
     Object.assign(local, JSON.parse(JSON.stringify(p)));
     if (!("description" in p)) {
       local.description = "";
+    }
+    if (!("autoRestart" in p)) {
+      local.autoRestart = true;
     }
     activePanel.value = "settings";
     projectLogText.value = "";

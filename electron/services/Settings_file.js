@@ -141,6 +141,7 @@ class Settings_file {
             description: "",
             uiPort: 1880,
             autoStart: true,
+            autoRestart: true,
             UrlAdmin: "http://localhost:1880/red/admin/",
             UrlDashboard: "http://localhost:1880/Dashboard/",
             adminAuth: false,
