@@ -1,19 +1,18 @@
 # Node-RED-Desktop
 
-Node-RED executable desktop.
+A cross-platform desktop application that bundles Node-RED and Node.js in a single Electron shell. No separate installation of Node.js or Node-RED is required.
 
-no need to install node-red and nodejs.
-Using only Electron.js and VUE 3
+## Features
 
-Multiple instances
-
-Run as a Windows service
-
-Redundancy between two applications
-
-Logging of multiple instance records to files
-
-windows 10 x64 , windows 11 x64, Ubunto LTS x64
+- **Multiple Instances**: Run multiple isolated Node-RED servers on different ports via Node.js child processes.
+- **Automatic Crash Recovery**: Automatically restarts failed or crashed instances with back-off delay (configurable via `autoRestart` option).
+- **Embedded & External Browsing**: Open Node-RED editor and dashboard in custom Electron windows or the system's default browser.
+- **Windows Service Wrapper**: Install and run the application as a Windows service at system boot using the bundled WinSW.
+- **High-Availability Redundancy**: Primary/Secondary redundancy mode using UDP heartbeat synchronization for automatic failover.
+- **Per-Instance Logging**: Capture and save daily rotating stdout/stderr logs for every instance.
+- **Secure Admin Authentication**: Protect instances using custom bcrypt-hashed credentials stored in configuration.
+- **HTTPS Support**: Secure local instances using TLS certificate and key files.
+- **Cross-Platform Support**: Compatible with Windows 10/11 x64 and Ubuntu LTS x64.
 
 ![node-red-desktop](/resources/node-red-desktop-demonstration.gif) 
 
