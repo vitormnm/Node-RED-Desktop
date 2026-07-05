@@ -20,6 +20,8 @@ class RedudancySettings {
   async set_startupProjectWindow(iPayload) {
     const settings_file = await Settings_file.getFile();
 
+    settings_file.app.theme = iPayload.app.theme || "dark";
+
     settings_file.app.startupProjectWindow = {
       enabled: iPayload.app.startupProjectWindow.enabled,
       fullscreen: iPayload.app.startupProjectWindow.fullscreen,

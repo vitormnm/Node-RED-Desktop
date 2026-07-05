@@ -118,6 +118,7 @@ class Settings_file {
         app: {
           name: "Node-RED Desktop2",
           version: "2.0.0",
+          theme: "dark",
           startupProjectWindow: {
             enabled: true,
             fullscreen: false,

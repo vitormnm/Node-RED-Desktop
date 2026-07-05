@@ -13,6 +13,6 @@ export default createVuetify({
   components,
   directives,
   theme: {
-    defaultTheme: 'system', // para testar, melhor fixar light
+    defaultTheme: 'dark',
   },
 })

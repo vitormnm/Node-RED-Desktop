@@ -1,8 +1,5 @@
 <template>
-  <v-container class="page" fluid>
-    <v-row justify="center">
-      <v-col cols="12" sm="8" md="5">
-        <v-card class="settings-card pa-6" elevation="2">
+  <v-card class="settings-card pa-4">
           <h2 class="heading">project start window</h2>
 
           <v-row class="mt-4" align="center">
@@ -43,6 +40,10 @@
           <v-text-field type="number" v-model="settingsJson.redundancy.port" hide-details class="mb-6"
             :error="errors.port.length > 0" :error-messages="errors.port" />
 
+          <div class="field-label">Theme</div>
+          <v-select class="mb-6" :items="themeOptions" item-title="title" item-value="value"
+            v-model="settingsJson.app.theme" density="comfortable" hide-details />
+
           <v-row>
             <v-col cols="auto">
               <v-btn size="small" block color="grey" @click="save">Save</v-btn>
@@ -65,14 +66,12 @@
             </v-col>
           </v-row>
 
+
           <v-divider class="my-6"></v-divider>
           <div class="text-center text-caption text-grey">
             Version: {{ appVersion }}
           </div>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+  </v-card>
 </template>
 
 <script setup>
@@ -86,6 +85,7 @@ const settingsJson = reactive({
   app: {
     name: null,
     version: null,
+    theme: "dark",
     startupProjectWindow: {
       enabled: null,
       fullscreen: false,
@@ -101,6 +101,13 @@ const settingsJson = reactive({
     port: null,
   },
 });
+
+// theme options
+const themeOptions = [
+  { title: "Dark", value: "dark" },
+  { title: "Light", value: "light" },
+  { title: "System default", value: "system" }
+];
 
 // lista de projetos
 const projects = ref([]);
@@ -125,6 +132,9 @@ onMounted(async () => {
 function rendersettingsJson(iPayload) {
   const cleanPayload = JSON.parse(JSON.stringify(iPayload));
   delete cleanPayload.appVersion;
+  if (cleanPayload.app && !cleanPayload.app.theme) {
+    cleanPayload.app.theme = "dark";
+  }
   Object.assign(settingsJson, cleanPayload);
 }
 
@@ -178,7 +188,8 @@ async function save() {
   const result = await window.api.post("/ctl_serverConfig_settings_save", updated);
 
   if (result.status == true) {
-    notify.success("Saved settings")
+    notify.success("Saved settings");
+    window.dispatchEvent(new CustomEvent("theme-changed", { detail: settingsJson.app.theme }));
   } else {
     notify.error("error while saving");
   }
