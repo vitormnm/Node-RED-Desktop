@@ -231,5 +231,6 @@ function formatRate(bytesPerSec) {
 }
 .action-btn {
   width: 160px;
+  justify-content: start !important;
 }
 </style>

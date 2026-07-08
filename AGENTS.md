@@ -500,6 +500,7 @@ Always prefix with the HTTP verb followed by `:`.
 - Use `reactive()` for form state, `ref()` for simple values.
 - Avoid direct DOM manipulation; use Vuetify components.
 - Polling intervals must be cleared in `onUnmounted()`.
+- **Button Layout** — Buttons that have both an icon and text must always place the icon at the beginning (left) followed by the text. Use the `prepend-icon` prop (e.g., `<v-btn prepend-icon="mdi-play">start</v-btn>`) or place `<v-icon start>` inside the button slot before the text. Standardize standard action buttons (e.g. across Info, Editor, Dashboard, Projects list, and Settings) to a fixed width of `160px` using the `.action-btn` class with `justify-content: start !important;` so that they remain consistently sized and left-aligned.
 
 ### Paths
 

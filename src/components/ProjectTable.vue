@@ -5,24 +5,20 @@
     </v-card-title> -->
     <!-- 🔹 BARRA DE AÇÕES -->
     <div class="table-actions">
-      <v-btn size="small" class="btn-small mx-1" color="green" @click="startSelected()">
-        <v-icon left>mdi-play</v-icon>
+      <v-btn size="small" class="action-btn" color="green" prepend-icon="mdi-play" @click="startSelected()">
         start
       </v-btn>
 
-      <v-btn size="small" class="btn-small mx-1" color="red" @click="stopSelected()">
-        <v-icon left>mdi-stop</v-icon>
+      <v-btn size="small" class="action-btn" color="red" prepend-icon="mdi-stop" @click="stopSelected()">
         stop
       </v-btn>
 
       <v-text-field v-model="search" label="search" density="compact" variant="outlined" hide-details clearable
-        class="search-field mx-1" />
+        class="search-field" />
     </div>
 
-       <div class="actions-row">
-      <v-spacer />
-      <v-btn size="small" color="grey" class="mt-3" @click="openNewProject">
-        <v-icon left>mdi-plus</v-icon>
+    <div class="table-actions">
+      <v-btn size="small" class="action-btn" color="grey" prepend-icon="mdi-plus" @click="openNewProject">
         New Project
       </v-btn>
     </div>
@@ -60,9 +56,6 @@
           </v-chip>
         </template>
 
-        <template #item.port="{ item }">
-          {{ item.uiPort }}
-        </template>
 
 
 
@@ -86,8 +79,7 @@ import ProjectDialog from "@/components/ProjectDialog.vue";
 const headers = [
   { title: "", key: "select", sortable: false },
   { title: "Name", key: "name" },
-  { title: "Port", key: "port" },
-
+  { title: "Port", key: "uiPort" },
 ];
 
 var projects = ref([]);
@@ -338,18 +330,16 @@ function toggleAll(value) {
   min-width: 50px !important;
 }
 
-.actions-row {
-  justify-content: flex-start;
-  align-items: center;
-  margin-top: 8px;
+.action-btn {
+  width: 160px;
+  justify-content: start !important;
 }
 
 .table-actions {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  /* 👈 muda aqui */
-  margin-bottom: 12px;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .search-field {

@@ -46,7 +46,7 @@
 
           <v-row>
             <v-col cols="auto">
-              <v-btn size="small" block color="grey" @click="save">Save</v-btn>
+              <v-btn size="small" class="action-btn" color="grey" prepend-icon="mdi-content-save" @click="save">Save</v-btn>
            
             </v-col>
           </v-row>
@@ -55,12 +55,12 @@
 
           <v-row class="mt-3" gap="3">
             <v-col cols="auto">
-              <v-btn size="small" block color="grey"  @click="service('install')">
+              <v-btn size="small" class="action-btn" color="grey" prepend-icon="mdi-plus" @click="service('install')">
                 Install service
               </v-btn>
             </v-col>
             <v-col cols="auto">
-              <v-btn size="small" block color="grey"  @click="service('delete')">
+              <v-btn size="small" class="action-btn" color="grey" prepend-icon="mdi-delete" @click="service('delete')">
                 Delete service
               </v-btn>
             </v-col>
@@ -231,5 +231,10 @@ async function service(mode) {
 <style scoped>
 .settings-outlined-btn {
   background-color: transparent !important;
+}
+
+.action-btn {
+  width: 160px;
+  justify-content: start !important;
 }
 </style>

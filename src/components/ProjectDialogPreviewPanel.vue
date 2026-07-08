@@ -5,10 +5,10 @@
     </v-alert>
 
     <div class="project-dialog-preview-actions mt-0">
-      <v-btn size="small" color="grey" @click="emit('open-action', localAction)">
-        Open extenal
+      <v-btn size="small" color="grey" class="action-btn" prepend-icon="mdi-monitor" @click="emit('open-action', localAction)">
+        Open external
       </v-btn>
-      <v-btn size="small" color="grey" @click="emit('open-action', webAction)">
+      <v-btn size="small" color="grey" class="action-btn" prepend-icon="mdi-open-in-new" @click="emit('open-action', webAction)">
         Open web
       </v-btn>
     </div>
@@ -63,6 +63,11 @@ const frameTitle = computed(() => (isEditor.value ? "Node-RED Editor" : "Node-RE
   flex-wrap: wrap;
   gap: 8px;
   flex-shrink: 0;
+}
+
+.action-btn {
+  width: 160px;
+  justify-content: start !important;
 }
 
 .project-dialog-preview-iframe {
