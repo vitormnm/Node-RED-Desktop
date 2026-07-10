@@ -37,7 +37,7 @@ ChangesAssociations=yes
 DisableProgramGroupPage=false
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputBaseFilename=Node-Red-5-Desktop-2.2
+OutputBaseFilename=Node-Red-5-Desktop-2.3
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
