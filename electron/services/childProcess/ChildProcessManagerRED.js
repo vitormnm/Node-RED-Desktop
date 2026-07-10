@@ -58,8 +58,16 @@ class ChildProcessManagerRED {
   async stopWorker(iID, iName) {
     const checkForkExiste = this.#child_process.find(item => item.id == iID);
     if (checkForkExiste !== undefined) {
-      this.#stopWorkerNodeRed(iID, iName);
+      await this.#stopWorkerNodeRed(iID, iName);
     }
+  }
+
+  async restartWorker(iID, iName) {
+    const checkForkExiste = this.#child_process.find(item => item.id == iID);
+    if (checkForkExiste !== undefined) {
+      await this.#stopWorkerNodeRed(iID, iName);
+    }
+    await this.starWorker(iID, iName);
   }
 
   // Iniciar worker Node-RED passando settings file
@@ -222,23 +230,33 @@ class ChildProcessManagerRED {
   async #stopWorkerNodeRed(iID, iName) {
     Logger.info(`Stop fork Node-RED: ${iName} - ${iID}`);
 
-    let index = 0;
-    let index_delete = -1;
+    const idx = this.#child_process.findIndex(el => el.id == iID);
+    if (idx === -1) return;
 
-    this.#child_process.forEach(async (element) => {
-      if (element.id == iID) {
-        index_delete = index;
-        if (element.retryTimer) {
-          clearTimeout(element.retryTimer);
-          element.retryTimer = null;
-        }
-        if (element.child_process) {
-          await element.child_process.kill();
-        }
-        this.#child_process.splice(index_delete, 1);
-      }
-      index++;
-    });
+    const element = this.#child_process[idx];
+
+    if (element.retryTimer) {
+      clearTimeout(element.retryTimer);
+      element.retryTimer = null;
+    }
+
+    if (element.child_process) {
+      const child = element.child_process;
+      child.removeAllListeners('exit');
+      
+      return new Promise((resolve) => {
+        child.once('exit', () => {
+          const idx2 = this.#child_process.findIndex(el => el.id == iID);
+          if (idx2 !== -1) {
+            this.#child_process.splice(idx2, 1);
+          }
+          resolve();
+        });
+        child.kill();
+      });
+    } else {
+      this.#child_process.splice(idx, 1);
+    }
   }
 
   async #deleteForkLsit(iName) {

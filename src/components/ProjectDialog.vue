@@ -479,6 +479,11 @@ function onButtonOpenEditor(action, fullscreen = false) {
     return;
   }
 
+  if (action === "restart_project") {
+    window.api.post("/ctl_project_restartWoker", { id: local.id, name: local.name });
+    return;
+  }
+
   const payload = {
     action,
     id: local.id,

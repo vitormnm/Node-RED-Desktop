@@ -54,10 +54,10 @@
         <v-btn
           class="action-btn"
           size="small"
-          color="grey"
-          prepend-icon="mdi-folder-open"
-          @click="emit('open-action', 'open_folder')"
-        >Open Folder</v-btn>
+          color="orange"
+          prepend-icon="mdi-restart"
+          @click="emit('open-action', 'restart_project')"
+        >Restart</v-btn>
       </div>
     </div>
 
@@ -67,13 +67,22 @@
     <div class="action-group">
       <div class="action-group-label">Open</div>
 
-      <v-checkbox
-        v-model="fullscreen"
-        label="Open local window in fullscreen"
-        density="compact"
-        hide-details
-        class="mb-3"
-      />
+      <div class="d-flex align-center flex-wrap" style="gap: 16px;">
+        <v-btn
+          class="action-btn"
+          size="small"
+          color="grey"
+          prepend-icon="mdi-folder-open"
+          @click="emit('open-action', 'open_folder')"
+        >Open Folder</v-btn>
+        <v-checkbox
+          v-model="fullscreen"
+          label="Open local window in fullscreen"
+          density="compact"
+          hide-details
+          class="ma-0"
+        />
+      </div>
 
       <div class="action-row">
         <v-btn

@@ -48,6 +48,11 @@ export function registerProjectRoutes() {
   })
 
   //Read full config.json file
+  ipcMain.handle('POST:/ctl_project_restartWoker', async (event, data) => {
+    ChildProcessManagerRED.restartWorker(data.id, data.name);
+  })
+
+  //Read full config.json file
   ipcMain.handle('POST:/ctl_project_addProject', async (event, data) => {
     return await ControlProject.add(data);
   })
