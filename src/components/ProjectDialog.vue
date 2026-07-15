@@ -50,7 +50,6 @@
             v-else-if="(activePanel === 'editor' || activePanel === 'dashboard') && isProjectRunning"
             :panel-type="activePanel"
             :url="activePanel === 'editor' ? local.UrlAdmin : local.UrlDashboard"
-            @open-action="onButtonOpenEditor"
           />
 
           <ProjectDialogInfo

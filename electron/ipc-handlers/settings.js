@@ -15,6 +15,7 @@ export function registerSettingsRoutes() {
     try {
       await AppSettings.set_RedudancySettings(data);
       await AppSettings.set_startupProjectWindow(data);
+      await AppSettings.set_ServiceSettings(data);
 
       return {"status" : true}
     }catch{

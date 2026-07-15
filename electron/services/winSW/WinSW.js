@@ -4,6 +4,7 @@ import { exec } from 'child_process';
 import util from 'util';
 import path from 'path';
 import Logger from "../Logger.js";
+import Settings_file from '../Settings_file.js';
 
 // Transforming exec into a Promise-based function
 const execAsync = util.promisify(exec);
@@ -35,7 +36,9 @@ class WinSW {
 
   async StartService() {
     try {
-      const { stdout, stderr } = await execAsync(`net start Node-Red-Desktop`);
+      const settings = await Settings_file.getFile();
+      const serviceName = settings.service?.name || "Node-RED-Desktop";
+      const { stdout, stderr } = await execAsync(`net start "${serviceName}"`);
 
       if (stderr) Logger.error("Erro:", stderr);
 
@@ -46,7 +49,9 @@ class WinSW {
 
   async stopService() {
     try {
-      const { stdout, stderr } = await execAsync(`net stop Node-RED-Desktop`);
+      const settings = await Settings_file.getFile();
+      const serviceName = settings.service?.name || "Node-RED-Desktop";
+      const { stdout, stderr } = await execAsync(`net stop "${serviceName}"`);
 
       if (stderr) {
         Logger.error("Error while running:", stderr);
@@ -62,7 +67,9 @@ class WinSW {
 
   async DeleteService() {
     try {
-      const { stdout, stderr } = await execAsync(`SC DELETE Node-Red-Desktop`);
+      const settings = await Settings_file.getFile();
+      const serviceName = settings.service?.name || "Node-RED-Desktop";
+      const { stdout, stderr } = await execAsync(`SC DELETE "${serviceName}"`);
 
       if (stderr) {
         Logger.error("windows service error execute: " + stderr);
@@ -79,15 +86,30 @@ class WinSW {
   }
 
   async #writeConfigXML() {
+    const settings = await Settings_file.getFile();
+    const serviceConfig = settings.service || {
+      name: "Node-RED-Desktop",
+      description: "Node-RED-Desktop",
+      onFailureAction: "restart",
+      onFailureDelay: "5 sec",
+      startMode: "Automatic"
+    };
+
+    const serviceName = serviceConfig.name || "Node-RED-Desktop";
+    const serviceDesc = serviceConfig.description || "Node-RED-Desktop";
+    const onFailureAction = serviceConfig.onFailureAction || "restart";
+    const onFailureDelay = serviceConfig.onFailureDelay || "5 sec";
+    const startMode = serviceConfig.startMode || "Automatic";
+
     const diretorioExecucao = path.dirname(app.getPath('exe'));
     const appDiretorio = app.getPath('exe');
     const WinSWFile = path.join(diretorioExecucao, 'WinSW', 'WinSW.xml');
 
     const config_xml = `
         <service>
-            <id>Node-RED-Desktop</id>
-            <name>Node-RED-Desktop</name>
-            <description>Node-RED-Desktop</description>
+            <id>${serviceName}</id>
+            <name>${serviceName}</name>
+            <description>${serviceDesc}</description>
             
             <executable>${appDiretorio}</executable>
             <arguments></arguments>
@@ -96,9 +118,9 @@ class WinSW {
             <logpath>${diretorioExecucao}\\logs</logpath>
             <log mode="roll"></log>
 
-            <onfailure action="restart" delay="5 sec"/>
+            <onfailure action="${onFailureAction}" delay="${onFailureDelay}"/>
 
-            <startmode>Automatic</startmode>
+            <startmode>${startMode}</startmode>
         </service>
     `;
 

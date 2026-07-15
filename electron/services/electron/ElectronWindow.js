@@ -27,13 +27,29 @@ class ElectronWindow {
 
         const winde = new BrowserWindow({ ...defaultConfig, ...iConfig });
 
-        winde.once('ready-to-show', () => {
-            if (iFullScreen) {
-                winde.setFullScreen(true);
-            } else {
-                winde.maximize();
+        let isShown = false;
+        const showWindow = () => {
+            if (!isShown) {
+                isShown = true;
+                if (iFullScreen) {
+                    winde.setFullScreen(true);
+                } else {
+                    winde.maximize();
+                }
+                winde.show();
             }
-            winde.show();
+        };
+
+        winde.once('ready-to-show', showWindow);
+
+        // Fallback for Linux/Wayland environments where ready-to-show may deadlock
+        winde.webContents.once('did-finish-load', () => {
+            setTimeout(showWindow, 100);
+        });
+
+        // Fallback in case of loading error
+        winde.webContents.once('did-fail-load', () => {
+            showWindow();
         });
 
         if (this.#isDev) {

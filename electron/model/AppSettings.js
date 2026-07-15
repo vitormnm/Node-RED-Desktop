@@ -31,6 +31,20 @@ class RedudancySettings {
 
     await Settings_file.WriteFile(settings_file);
   }
+
+  async set_ServiceSettings(iPayload) {
+    const settings_file = await Settings_file.getFile();
+
+    settings_file.service = {
+      name: iPayload.service?.name || "Node-RED-Desktop",
+      description: iPayload.service?.description || "Node-RED-Desktop",
+      onFailureAction: iPayload.service?.onFailureAction || "restart",
+      onFailureDelay: iPayload.service?.onFailureDelay || "5 sec",
+      startMode: iPayload.service?.startMode || "Automatic"
+    };
+
+    await Settings_file.WriteFile(settings_file);
+  }
 }
 
 export default new RedudancySettings();

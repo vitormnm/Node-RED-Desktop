@@ -135,6 +135,13 @@ class Settings_file {
           timeout_ms_primary: 250,
           timeout_ms_secondary: 500
         },
+        service: {
+          name: "Node-RED-Desktop",
+          description: "Node-RED-Desktop",
+          onFailureAction: "restart",
+          onFailureDelay: "5 sec",
+          startMode: "Automatic"
+        },
         projects: [
           {
             name: "Main",

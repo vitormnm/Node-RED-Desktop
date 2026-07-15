@@ -1,10 +1,16 @@
 <template>
-  <v-card class="pa-4">
+  <v-card class="pa-4 project-card">
     <!-- <v-card-title>
       
     </v-card-title> -->
     <!-- 🔹 BARRA DE AÇÕES -->
     <div class="table-actions">
+      <v-btn size="small" class="action-btn" color="grey" prepend-icon="mdi-plus" @click="openNewProject">
+        New Project
+      </v-btn>
+    </div>
+
+    <div class="table-actions sticky-actions">
       <v-btn size="small" class="action-btn" color="green" prepend-icon="mdi-play" @click="startSelected()">
         start
       </v-btn>
@@ -15,12 +21,6 @@
 
       <v-text-field v-model="search" label="search" density="compact" variant="outlined" hide-details clearable
         class="search-field" />
-    </div>
-
-    <div class="table-actions">
-      <v-btn size="small" class="action-btn" color="grey" prepend-icon="mdi-plus" @click="openNewProject">
-        New Project
-      </v-btn>
     </div>
 
     <div class="table-wrapper">
@@ -344,5 +344,25 @@ function toggleAll(value) {
 
 .search-field {
   max-width: 280px;
+}
+
+.project-card {
+  overflow: visible !important;
+}
+
+.sticky-actions {
+  position: sticky;
+  top: 48px; /* Sticks right below the compact v-tabs top menu */
+  z-index: 10;
+  background: rgb(var(--v-theme-surface));
+  /* Extend to cover card padding margins so table content scrolls behind it cleanly */
+  margin-left: -16px;
+  margin-right: -16px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  margin-top: -12px;
+  border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
 }
 </style>

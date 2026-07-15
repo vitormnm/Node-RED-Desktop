@@ -44,14 +44,27 @@
           <v-select class="mb-6" :items="themeOptions" item-title="title" item-value="value"
             v-model="settingsJson.app.theme" density="comfortable" hide-details />
 
-          <v-row>
-            <v-col cols="auto">
-              <v-btn size="small" class="action-btn" color="grey" prepend-icon="mdi-content-save" @click="save">Save</v-btn>
-           
-            </v-col>
-          </v-row>
-
           <h3 class="subheading mt-8">Windows service</h3>
+
+          <div class="field-label mt-4">Service Name / ID</div>
+          <v-text-field v-model="settingsJson.service.name" hide-details class="mb-4"
+            :error="errors.serviceName.length > 0" :error-messages="errors.serviceName" />
+
+          <div class="field-label">Description</div>
+          <v-text-field v-model="settingsJson.service.description" hide-details class="mb-4"
+            :error="errors.serviceDescription.length > 0" :error-messages="errors.serviceDescription" />
+
+          <div class="field-label">Startup Mode</div>
+          <v-select class="mb-4" :items="['Automatic', 'Manual', 'Disabled', 'Delayed']"
+            v-model="settingsJson.service.startMode" density="comfortable" hide-details />
+
+          <div class="field-label">On Failure Action</div>
+          <v-select class="mb-4" :items="['restart', 'reboot', 'none']"
+            v-model="settingsJson.service.onFailureAction" density="comfortable" hide-details />
+
+          <div class="field-label">On Failure Delay</div>
+          <v-text-field v-model="settingsJson.service.onFailureDelay" hide-details class="mb-6"
+            placeholder="e.g. 5 sec" :error="errors.serviceOnFailureDelay.length > 0" :error-messages="errors.serviceOnFailureDelay" />
 
           <v-row class="mt-3" gap="3">
             <v-col cols="auto">
@@ -63,6 +76,12 @@
               <v-btn size="small" class="action-btn" color="grey" prepend-icon="mdi-delete" @click="service('delete')">
                 Delete service
               </v-btn>
+            </v-col>
+          </v-row>
+
+          <v-row class="mt-6">
+            <v-col cols="auto">
+              <v-btn size="small" class="action-btn" color="grey" prepend-icon="mdi-content-save" @click="save">Save</v-btn>
             </v-col>
           </v-row>
 
@@ -100,6 +119,13 @@ const settingsJson = reactive({
     ip: null,
     port: null,
   },
+  service: {
+    name: "Node-RED-Desktop",
+    description: "Node-RED-Desktop",
+    onFailureAction: "restart",
+    onFailureDelay: "5 sec",
+    startMode: "Automatic"
+  }
 });
 
 // theme options
@@ -118,6 +144,9 @@ const errors = reactive({
   url: [],
   ip: [],
   port: [],
+  serviceName: [],
+  serviceDescription: [],
+  serviceOnFailureDelay: []
 });
 
 // carregar ao iniciar
@@ -134,6 +163,15 @@ function rendersettingsJson(iPayload) {
   delete cleanPayload.appVersion;
   if (cleanPayload.app && !cleanPayload.app.theme) {
     cleanPayload.app.theme = "dark";
+  }
+  if (!cleanPayload.service) {
+    cleanPayload.service = {
+      name: "Node-RED-Desktop",
+      description: "Node-RED-Desktop",
+      onFailureAction: "restart",
+      onFailureDelay: "5 sec",
+      startMode: "Automatic"
+    };
   }
   Object.assign(settingsJson, cleanPayload);
 }
@@ -171,6 +209,21 @@ function validate() {
     ok = false;
   }
 
+  if (!settingsJson.service.name?.trim()) {
+    errors.serviceName.push("The service name cannot be empty.");
+    ok = false;
+  }
+
+  if (!settingsJson.service.description?.trim()) {
+    errors.serviceDescription.push("The description cannot be empty.");
+    ok = false;
+  }
+
+  if (!settingsJson.service.onFailureDelay?.trim()) {
+    errors.serviceOnFailureDelay.push("The failure delay cannot be empty.");
+    ok = false;
+  }
+
   if (!ok) {
     notify.error("Existem erros no settingsJsonulário");
   }
@@ -182,7 +235,7 @@ function validate() {
 // save
 // -----------------------------
 async function save() {
-  if (!validate()) return;
+  if (!validate()) return false;
 
   const updated = JSON.parse(JSON.stringify(settingsJson));
   const result = await window.api.post("/ctl_serverConfig_settings_save", updated);
@@ -190,11 +243,11 @@ async function save() {
   if (result.status == true) {
     notify.success("Saved settings");
     window.dispatchEvent(new CustomEvent("theme-changed", { detail: settingsJson.app.theme }));
+    return true;
   } else {
     notify.error("error while saving");
+    return false;
   }
-
-
 }
 
 // serviço windows
@@ -202,10 +255,12 @@ async function save() {
 async function service(mode) {
 
   if (mode == 'install') {
+    const saved = await save();
+    if (!saved) return;
+
     const payload = await window.api.post('/ctl_serverConfig_service');
 
     if (payload.status == true) {
-
       notify.success("Service create");
     } else {
       notify.error("Error service create");

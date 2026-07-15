@@ -4,18 +4,9 @@
       {{ missingUrlMessage }}
     </v-alert>
 
-    <div class="project-dialog-preview-actions mt-0">
-      <v-btn size="small" color="grey" class="action-btn" prepend-icon="mdi-monitor" @click="emit('open-action', localAction)">
-        Open external
-      </v-btn>
-      <v-btn size="small" color="grey" class="action-btn" prepend-icon="mdi-open-in-new" @click="emit('open-action', webAction)">
-        Open web
-      </v-btn>
-    </div>
-
     <iframe
       v-if="url"
-      class="project-dialog-preview-iframe mt-2"
+      class="project-dialog-preview-iframe"
       :src="url"
       :title="frameTitle"
     />
@@ -36,16 +27,12 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(["open-action"]);
-
 const isEditor = computed(() => props.panelType === "editor");
 const missingUrlMessage = computed(() =>
   isEditor.value
     ? "URL do editor nao cadastrada para este projeto."
     : "URL do dashboard nao cadastrada para este projeto."
 );
-const localAction = computed(() => (isEditor.value ? "open_editor" : "open_dashboard"));
-const webAction = computed(() => (isEditor.value ? "open_editor_web" : "open_dashboard_web"));
 const frameTitle = computed(() => (isEditor.value ? "Node-RED Editor" : "Node-RED Dashboard"));
 </script>
 
@@ -56,18 +43,6 @@ const frameTitle = computed(() => (isEditor.value ? "Node-RED Editor" : "Node-RE
   flex: 1 1 auto;
   min-height: 0;
   height: 100%;
-}
-
-.project-dialog-preview-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.action-btn {
-  width: 160px;
-  justify-content: start !important;
 }
 
 .project-dialog-preview-iframe {
