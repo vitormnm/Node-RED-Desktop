@@ -6,7 +6,7 @@
     content-class="project-dialog-overlay-content"
   >
     <v-card class="project-dialog-card--fixed">
-      <v-toolbar flat>
+      <v-toolbar flat density="compact">
         <v-toolbar-title>{{ dialogTitle }}</v-toolbar-title>
         <v-spacer />
         <v-btn icon @click="onClose"><v-icon>mdi-close</v-icon></v-btn>
@@ -159,6 +159,7 @@ const logScrollTop = ref(0);
 
 const errors = reactive({
   name: [],
+  version: [],
   uiPort: [],
   httpAdminRoot: [],
   httpNodeRoot: [],
@@ -183,6 +184,7 @@ const local = reactive({
   UrlDashboard: "",
   adminAuth: false,
   description: "",
+  version: "0.0.1",
   projectsStatus: null,
   settings: {
     flowFile: "",
@@ -239,6 +241,9 @@ watch(
     Object.assign(local, JSON.parse(JSON.stringify(p)));
     if (!("description" in p)) {
       local.description = "";
+    }
+    if (!("version" in p)) {
+      local.version = "0.0.1";
     }
     if (!("autoRestart" in p)) {
       local.autoRestart = true;
@@ -358,6 +363,11 @@ async function validate() {
 
   if (!local.name.trim()) {
     errors.name.push("Name cannot be empty.");
+    ok = false;
+  }
+
+  if (!local.version || !local.version.trim()) {
+    errors.version.push("Version cannot be empty.");
     ok = false;
   }
 

@@ -70,36 +70,110 @@ export default async function () {
         return `${pathToFileURL(indexPath).href}#/${iPage}`;
     }
 
+    function getTrayWindowPosition() {
+        const cursorPoint = screen.getCursorScreenPoint();
+        const display = screen.getDisplayNearestPoint(cursorPoint) || screen.getPrimaryDisplay();
+        const workArea = display.workArea;
+        const winWidth = 700;
+        const winHeight = 600;
+
+        const isLinux = process.platform === "linux";
+        const isMac = process.platform === "darwin";
+
+        let x;
+        let y;
+
+        if (isLinux || isMac) {
+            // Ubuntu / Linux GNOME: Top-right corner right below top bar
+            x = workArea.x + workArea.width - winWidth;
+            y = workArea.y;
+        } else {
+            // Windows: Bottom-right corner right above taskbar
+            let trayBounds = null;
+            try {
+                if (top.tray && typeof top.tray.getBounds === "function") {
+                    const b = top.tray.getBounds();
+                    if (b && b.width > 0 && b.height > 0) {
+                        trayBounds = b;
+                    }
+                }
+            } catch (e) {
+                trayBounds = null;
+            }
+
+            if (trayBounds) {
+                x = Math.round(trayBounds.x + trayBounds.width / 2 - winWidth / 2);
+                y = Math.round(trayBounds.y - winHeight);
+            } else {
+                x = workArea.x + workArea.width - winWidth;
+                y = workArea.y + workArea.height - winHeight;
+            }
+        }
+
+        // Clamp to screen workArea boundaries
+        x = Math.max(workArea.x, Math.min(x, workArea.x + workArea.width - winWidth));
+        y = Math.max(workArea.y, Math.min(y, workArea.y + workArea.height - winHeight));
+
+        return { x: Math.round(x), y: Math.round(y), winWidth, winHeight };
+    }
+
+    function applyWindowBounds(win, x, y, width, height) {
+        if (!win || win.isDestroyed()) return;
+
+        // Apply bounds immediately
+        win.setBounds({ x, y, width, height });
+
+        // On Linux / GNOME Mutter, window manager defers placement hints until window map completes.
+        // Re-applying setBounds after map/show via setTimeout guarantees top-right placement on Ubuntu GNOME.
+        setTimeout(() => {
+            if (win && !win.isDestroyed()) {
+                win.setBounds({ x, y, width, height });
+            }
+        }, 50);
+
+        setTimeout(() => {
+            if (win && !win.isDestroyed()) {
+                win.setBounds({ x, y, width, height });
+            }
+        }, 150);
+    }
+
     function openWindow(iPage) {
         const targetUrl = buildRendererUrl(iPage);
+        const isLinux = process.platform === "linux";
+        const { x, y, winWidth, winHeight } = getTrayWindowPosition();
+
+        const displayWindow = (win) => {
+            if (!win || win.isDestroyed()) return;
+            if (isLinux) {
+                win.maximize();
+            } else {
+                applyWindowBounds(win, x, y, winWidth, winHeight);
+            }
+            win.show();
+            win.focus();
+        };
 
         if (mainWindow && !mainWindow.isDestroyed()) {
             if (mainWindow.isMinimized()) {
                 mainWindow.restore();
             }
 
-            // Reutiliza a janela existente e navega para a rota selecionada.
             if (mainWindow.webContents.getURL() !== targetUrl) {
                 mainWindow.loadURL(targetUrl);
             }
 
-            mainWindow.show();
-            mainWindow.focus();
+            displayWindow(mainWindow);
             return;
         }
-
-        const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-        const winWidth = 700;
-        const winHeight = 600;
-        const x = width - winWidth;
-        const y = height - winHeight;
 
         mainWindow = new BrowserWindow({
             width: winWidth,
             height: winHeight,
-            x,
-            y,
+            x: isLinux ? undefined : x,
+            y: isLinux ? undefined : y,
             frame: true,
+            show: false,
             webPreferences: {
                 nodeIntegration: false,
                 contextIsolation: true,
@@ -112,7 +186,23 @@ export default async function () {
         });
 
         mainWindow.loadURL(targetUrl);
-        mainWindow.show();
-        mainWindow.focus();
+
+        mainWindow.once("ready-to-show", () => {
+            displayWindow(mainWindow);
+        });
+
+        // Fallback for Linux Wayland/X11 if ready-to-show doesn't fire
+        mainWindow.webContents.once("did-finish-load", () => {
+            if (mainWindow && !mainWindow.isDestroyed() && !mainWindow.isVisible()) {
+                displayWindow(mainWindow);
+            }
+        });
+
+        // Fallback timeout
+        setTimeout(() => {
+            if (mainWindow && !mainWindow.isDestroyed() && !mainWindow.isVisible()) {
+                displayWindow(mainWindow);
+            }
+        }, 300);
     }
 }

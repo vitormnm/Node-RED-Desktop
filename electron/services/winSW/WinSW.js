@@ -37,7 +37,7 @@ class WinSW {
   async StartService() {
     try {
       const settings = await Settings_file.getFile();
-      const serviceName = settings.service?.name || "Node-RED-Desktop";
+      const serviceName = settings.app?.service?.name || settings.service?.name || "Node-RED-Desktop";
       const { stdout, stderr } = await execAsync(`net start "${serviceName}"`);
 
       if (stderr) Logger.error("Erro:", stderr);
@@ -50,7 +50,7 @@ class WinSW {
   async stopService() {
     try {
       const settings = await Settings_file.getFile();
-      const serviceName = settings.service?.name || "Node-RED-Desktop";
+      const serviceName = settings.app?.service?.name || settings.service?.name || "Node-RED-Desktop";
       const { stdout, stderr } = await execAsync(`net stop "${serviceName}"`);
 
       if (stderr) {
@@ -68,7 +68,7 @@ class WinSW {
   async DeleteService() {
     try {
       const settings = await Settings_file.getFile();
-      const serviceName = settings.service?.name || "Node-RED-Desktop";
+      const serviceName = settings.app?.service?.name || settings.service?.name || "Node-RED-Desktop";
       const { stdout, stderr } = await execAsync(`SC DELETE "${serviceName}"`);
 
       if (stderr) {
@@ -87,7 +87,7 @@ class WinSW {
 
   async #writeConfigXML() {
     const settings = await Settings_file.getFile();
-    const serviceConfig = settings.service || {
+    const serviceConfig = settings.app?.service || settings.service || {
       name: "Node-RED-Desktop",
       description: "Node-RED-Desktop",
       onFailureAction: "restart",

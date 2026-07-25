@@ -11,6 +11,8 @@
         max-rows="3"
       />
 
+      <v-text-field label="Version" v-model="local.version" :error-messages="errors.version" />
+
       <v-text-field label="Port" type="number" v-model="local.uiPort" :error-messages="errors.uiPort" />
 
       <v-row>
@@ -116,15 +118,69 @@
 
       <v-text-field label="Url Dashboard Node-RED" v-model="local.UrlDashboard" :error-messages="errors.UrlDashboard" />
 
-      <v-text-field label="HTTPS key file" v-model="local.settings.https.key" :error-messages="errors.httpsKey" />
+      <v-text-field
+        label="HTTPS key file"
+        v-model="local.settings.https.key"
+        :error-messages="errors.httpsKey"
+        append-inner-icon="mdi-folder-open"
+        title="Select HTTPS key file"
+        @click:append-inner="selectKeyFile"
+      />
 
-      <v-text-field label="HTTPS cert file" v-model="local.settings.https.cert" :error-messages="errors.httpsCert" />
+      <v-text-field
+        label="HTTPS cert file"
+        v-model="local.settings.https.cert"
+        :error-messages="errors.httpsCert"
+        append-inner-icon="mdi-folder-open"
+        title="Select HTTPS cert file"
+        @click:append-inner="selectCertFile"
+      />
     </v-form>
   </section>
 </template>
 
 <script setup>
 import { computed, watch } from "vue";
+
+async function selectKeyFile() {
+  try {
+    const res = await window.api.post("/ctl_project_select_file", {
+      title: "Select HTTPS Key File",
+      filters: [
+        { name: "Key Files (*.key, *.pem)", extensions: ["key", "pem"] },
+        { name: "All Files", extensions: ["*"] }
+      ]
+    });
+    if (res && res.status !== false && !res.canceled && res.filePath) {
+      if (!props.local.settings.https) {
+        props.local.settings.https = { enabled: false, key: "", cert: "" };
+      }
+      props.local.settings.https.key = res.filePath;
+    }
+  } catch (err) {
+    console.error("Error selecting HTTPS key file:", err);
+  }
+}
+
+async function selectCertFile() {
+  try {
+    const res = await window.api.post("/ctl_project_select_file", {
+      title: "Select HTTPS Certificate File",
+      filters: [
+        { name: "Certificate Files (*.crt, *.pem, *.cert)", extensions: ["crt", "pem", "cert"] },
+        { name: "All Files", extensions: ["*"] }
+      ]
+    });
+    if (res && res.status !== false && !res.canceled && res.filePath) {
+      if (!props.local.settings.https) {
+        props.local.settings.https = { enabled: false, key: "", cert: "" };
+      }
+      props.local.settings.https.cert = res.filePath;
+    }
+  } catch (err) {
+    console.error("Error selecting HTTPS cert file:", err);
+  }
+}
 
 const permissionOptions = [
   { title: "Admin", value: "*" },

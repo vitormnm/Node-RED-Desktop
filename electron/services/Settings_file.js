@@ -63,6 +63,18 @@ class Settings_file {
       const data = await fs.readFile(filePath, { encoding: 'utf8' });
       const result = JSON.parse(data);
 
+      let modified = false;
+      if (result && result.service) {
+        if (!result.app) result.app = {};
+        result.app.service = result.service;
+        delete result.service;
+        modified = true;
+      }
+
+      if (modified) {
+        await this.WriteFile(result);
+      }
+
       return result
     } catch (err) {
       Logger.info("create default settings.json: " + err);
@@ -125,7 +137,14 @@ class Settings_file {
             id: UUID,
             url: "http://localhost:1880/red/admin/"
           },
-          description: ""
+          description: "",
+          service: {
+            name: "Node-RED-Desktop",
+            description: "Node-RED-Desktop",
+            onFailureAction: "restart",
+            onFailureDelay: "5 sec",
+            startMode: "Automatic"
+          }
         },
         redundancy: {
           enabled: false,
@@ -135,18 +154,12 @@ class Settings_file {
           timeout_ms_primary: 250,
           timeout_ms_secondary: 500
         },
-        service: {
-          name: "Node-RED-Desktop",
-          description: "Node-RED-Desktop",
-          onFailureAction: "restart",
-          onFailureDelay: "5 sec",
-          startMode: "Automatic"
-        },
         projects: [
           {
             name: "Main",
             id: UUID,
             description: "",
+            version: "0.0.1",
             uiPort: 1880,
             autoStart: true,
             autoRestart: true,

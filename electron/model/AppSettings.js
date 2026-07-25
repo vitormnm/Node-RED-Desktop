@@ -35,13 +35,21 @@ class RedudancySettings {
   async set_ServiceSettings(iPayload) {
     const settings_file = await Settings_file.getFile();
 
-    settings_file.service = {
-      name: iPayload.service?.name || "Node-RED-Desktop",
-      description: iPayload.service?.description || "Node-RED-Desktop",
-      onFailureAction: iPayload.service?.onFailureAction || "restart",
-      onFailureDelay: iPayload.service?.onFailureDelay || "5 sec",
-      startMode: iPayload.service?.startMode || "Automatic"
+    if (!settings_file.app) {
+      settings_file.app = {};
+    }
+
+    const serviceData = iPayload.app?.service || iPayload.service || {};
+
+    settings_file.app.service = {
+      name: serviceData.name || "Node-RED-Desktop",
+      description: serviceData.description || "Node-RED-Desktop",
+      onFailureAction: serviceData.onFailureAction || "restart",
+      onFailureDelay: serviceData.onFailureDelay || "5 sec",
+      startMode: serviceData.startMode || "Automatic"
     };
+
+    delete settings_file.service;
 
     await Settings_file.WriteFile(settings_file);
   }

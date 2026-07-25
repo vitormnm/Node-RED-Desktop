@@ -1,6 +1,6 @@
 <template>
   <v-card class="settings-card pa-4">
-          <h2 class="heading">project start window</h2>
+          <h3 class="subheading">Project start window</h3>
 
           <v-row class="mt-4" align="center">
             <v-checkbox v-model="settingsJson.app.startupProjectWindow.enabled" density="compact" label="enabled" />
@@ -44,40 +44,42 @@
           <v-select class="mb-6" :items="themeOptions" item-title="title" item-value="value"
             v-model="settingsJson.app.theme" density="comfortable" hide-details />
 
-          <h3 class="subheading mt-8">Windows service</h3>
+          <div v-if="isWindows">
+            <h3 class="subheading mt-8">Windows service</h3>
 
-          <div class="field-label mt-4">Service Name / ID</div>
-          <v-text-field v-model="settingsJson.service.name" hide-details class="mb-4"
-            :error="errors.serviceName.length > 0" :error-messages="errors.serviceName" />
+            <div class="field-label mt-4">Service Name / ID</div>
+            <v-text-field v-model="settingsJson.app.service.name" hide-details class="mb-4"
+              :error="errors.serviceName.length > 0" :error-messages="errors.serviceName" />
 
-          <div class="field-label">Description</div>
-          <v-text-field v-model="settingsJson.service.description" hide-details class="mb-4"
-            :error="errors.serviceDescription.length > 0" :error-messages="errors.serviceDescription" />
+            <div class="field-label">Description</div>
+            <v-text-field v-model="settingsJson.app.service.description" hide-details class="mb-4"
+              :error="errors.serviceDescription.length > 0" :error-messages="errors.serviceDescription" />
 
-          <div class="field-label">Startup Mode</div>
-          <v-select class="mb-4" :items="['Automatic', 'Manual', 'Disabled', 'Delayed']"
-            v-model="settingsJson.service.startMode" density="comfortable" hide-details />
+            <div class="field-label">Startup Mode</div>
+            <v-select class="mb-4" :items="['Automatic', 'Manual', 'Disabled', 'Delayed']"
+              v-model="settingsJson.app.service.startMode" density="comfortable" hide-details />
 
-          <div class="field-label">On Failure Action</div>
-          <v-select class="mb-4" :items="['restart', 'reboot', 'none']"
-            v-model="settingsJson.service.onFailureAction" density="comfortable" hide-details />
+            <div class="field-label">On Failure Action</div>
+            <v-select class="mb-4" :items="['restart', 'reboot', 'none']"
+              v-model="settingsJson.app.service.onFailureAction" density="comfortable" hide-details />
 
-          <div class="field-label">On Failure Delay</div>
-          <v-text-field v-model="settingsJson.service.onFailureDelay" hide-details class="mb-6"
-            placeholder="e.g. 5 sec" :error="errors.serviceOnFailureDelay.length > 0" :error-messages="errors.serviceOnFailureDelay" />
+            <div class="field-label">On Failure Delay</div>
+            <v-text-field v-model="settingsJson.app.service.onFailureDelay" hide-details class="mb-6"
+              placeholder="e.g. 5 sec" :error="errors.serviceOnFailureDelay.length > 0" :error-messages="errors.serviceOnFailureDelay" />
 
-          <v-row class="mt-3" gap="3">
-            <v-col cols="auto">
-              <v-btn size="small" class="action-btn" color="grey" prepend-icon="mdi-plus" @click="service('install')">
-                Install service
-              </v-btn>
-            </v-col>
-            <v-col cols="auto">
-              <v-btn size="small" class="action-btn" color="grey" prepend-icon="mdi-delete" @click="service('delete')">
-                Delete service
-              </v-btn>
-            </v-col>
-          </v-row>
+            <v-row class="mt-3" gap="3">
+              <v-col cols="auto">
+                <v-btn size="small" class="action-btn" color="grey" prepend-icon="mdi-plus" @click="service('install')">
+                  Install service
+                </v-btn>
+              </v-col>
+              <v-col cols="auto">
+                <v-btn size="small" class="action-btn" color="grey" prepend-icon="mdi-delete" @click="service('delete')">
+                  Delete service
+                </v-btn>
+              </v-col>
+            </v-row>
+          </div>
 
           <v-row class="mt-6">
             <v-col cols="auto">
@@ -97,6 +99,7 @@
 import { reactive, onMounted, ref } from "vue";
 import { notify } from "@/utils/notify.js";
 
+const isWindows = window.api?.isWindows ? window.api.isWindows() : false;
 const appVersion = ref("");
 
 // JSON base
@@ -112,19 +115,19 @@ const settingsJson = reactive({
       url: null,
     },
     description: null,
+    service: {
+      name: "Node-RED-Desktop",
+      description: "Node-RED-Desktop",
+      onFailureAction: "restart",
+      onFailureDelay: "5 sec",
+      startMode: "Automatic"
+    }
   },
   redundancy: {
     enabled: false,
     type: null,
     ip: null,
     port: null,
-  },
-  service: {
-    name: "Node-RED-Desktop",
-    description: "Node-RED-Desktop",
-    onFailureAction: "restart",
-    onFailureDelay: "5 sec",
-    startMode: "Automatic"
   }
 });
 
@@ -164,8 +167,14 @@ function rendersettingsJson(iPayload) {
   if (cleanPayload.app && !cleanPayload.app.theme) {
     cleanPayload.app.theme = "dark";
   }
-  if (!cleanPayload.service) {
-    cleanPayload.service = {
+  if (cleanPayload.service && cleanPayload.app) {
+    if (!cleanPayload.app.service) {
+      cleanPayload.app.service = cleanPayload.service;
+    }
+    delete cleanPayload.service;
+  }
+  if (cleanPayload.app && !cleanPayload.app.service) {
+    cleanPayload.app.service = {
       name: "Node-RED-Desktop",
       description: "Node-RED-Desktop",
       onFailureAction: "restart",
@@ -209,19 +218,21 @@ function validate() {
     ok = false;
   }
 
-  if (!settingsJson.service.name?.trim()) {
-    errors.serviceName.push("The service name cannot be empty.");
-    ok = false;
-  }
+  if (isWindows) {
+    if (!settingsJson.app.service.name?.trim()) {
+      errors.serviceName.push("The service name cannot be empty.");
+      ok = false;
+    }
 
-  if (!settingsJson.service.description?.trim()) {
-    errors.serviceDescription.push("The description cannot be empty.");
-    ok = false;
-  }
+    if (!settingsJson.app.service.description?.trim()) {
+      errors.serviceDescription.push("The description cannot be empty.");
+      ok = false;
+    }
 
-  if (!settingsJson.service.onFailureDelay?.trim()) {
-    errors.serviceOnFailureDelay.push("The failure delay cannot be empty.");
-    ok = false;
+    if (!settingsJson.app.service.onFailureDelay?.trim()) {
+      errors.serviceOnFailureDelay.push("The failure delay cannot be empty.");
+      ok = false;
+    }
   }
 
   if (!ok) {

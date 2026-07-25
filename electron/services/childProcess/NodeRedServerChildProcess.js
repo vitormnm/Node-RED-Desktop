@@ -6,6 +6,33 @@ import RED from 'node-red';
 import path from 'path';
 import fs from 'fs';
 
+function sanitizePackageName(name) {
+  if (!name) return 'node-red-project';
+  
+  // Convert to lowercase and normalize accents/diacritics
+  let cleanName = name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  // Replace invalid characters with hyphens
+  cleanName = cleanName.replace(/[^a-z0-9_.-]/g, "-");
+
+  // Remove leading dots, underscores, or hyphens
+  cleanName = cleanName.replace(/^([._-])+/, "");
+
+  // Merge consecutive hyphens, dots, or underscores
+  cleanName = cleanName.replace(/-+/g, "-");
+  cleanName = cleanName.replace(/\.+/g, ".");
+  cleanName = cleanName.replace(/_+/g, "_");
+
+  if (!cleanName) {
+    cleanName = 'node-red-project';
+  }
+
+  return cleanName.substring(0, 214);
+}
+
 // It runs on Node-RED in a process originating from the childprocess.
 (async () => {
   const jsonParam = JSON.parse(process.argv[2]);
@@ -15,6 +42,45 @@ import fs from 'fs';
   const execPath = path.dirname(jsonParam.execPath);
   // Creat settings and read
   const settings_read = jsonParam.settings.settings;
+
+  // Update/create package.json in userDir to match current settings name, description, and version
+  try {
+    const userDir = settings_read.userDir;
+    if (userDir) {
+      if (!fs.existsSync(userDir)) {
+        fs.mkdirSync(userDir, { recursive: true });
+      }
+      
+      const packageJsonPath = path.join(userDir, 'package.json');
+      const projName = jsonParam.settings.name || 'node-red-project';
+      const projDesc = jsonParam.settings.description || 'A Node-RED Project';
+      const projVersion = jsonParam.settings.version || '0.0.1';
+      
+      const sanitizedName = sanitizePackageName(projName);
+      
+      let pkg = {};
+      if (fs.existsSync(packageJsonPath)) {
+        try {
+          const data = fs.readFileSync(packageJsonPath, 'utf8');
+          pkg = JSON.parse(data);
+        } catch (e) {
+          // ignore parsing error, start fresh
+        }
+      }
+      
+      pkg.name = sanitizedName;
+      pkg.description = projDesc;
+      pkg.version = projVersion;
+      
+      if (!pkg.dependencies) {
+        pkg.dependencies = {};
+      }
+      
+      fs.writeFileSync(packageJsonPath, JSON.stringify(pkg, null, 2), 'utf8');
+    }
+  } catch (err) {
+    console.error('Failed to update project package.json:', err);
+  }
 
   // Create an Express app and a server
   const app = express();

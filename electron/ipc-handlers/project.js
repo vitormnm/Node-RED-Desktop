@@ -1,4 +1,4 @@
-import { ipcMain, BrowserWindow, app } from 'electron';
+import { ipcMain, BrowserWindow, app, dialog } from 'electron';
 
 import ChildProcessManagerRED from "../services/childProcess/ChildProcessManagerRED.js";
 import ControlProject from "../model/ControlProject.js";
@@ -6,6 +6,7 @@ import Settings_file from "../services/Settings_file.js"
 
 import Project_openElectronWindow from "../model/Project_openElectronWindow.js"
 import ProjectLog from "../model/ProjectLog.js";
+import ReorderProject from "../model/ReorderProject.js";
 
 export function registerProjectRoutes() {
 
@@ -82,7 +83,30 @@ export function registerProjectRoutes() {
     return win ? win.id : null;
   });
 
+  ipcMain.handle('POST:/ctl_project_select_file', async (event, data = {}) => {
+    try {
+      const win = BrowserWindow.fromWebContents(event.sender);
+      const options = {
+        title: data.title || 'Select File',
+        properties: ['openFile'],
+        filters: data.filters || [{ name: 'All Files', extensions: ['*'] }]
+      };
+      const result = win ? await dialog.showOpenDialog(win, options) : await dialog.showOpenDialog(options);
+      if (!result.canceled && result.filePaths && result.filePaths.length > 0) {
+        return { status: true, canceled: false, filePath: result.filePaths[0] };
+      }
+      return { status: true, canceled: true, filePath: null };
+    } catch (error) {
+      return { status: false, message: error.message };
+    }
+  });
 
+  ipcMain.handle('PUT:/ctl_project_reorderProjects', async (event, data = {}) => {
+    return await ReorderProject.reorder(data.orderedIds);
+  });
 
+  ipcMain.handle('POST:/ctl_project_reorderProjects', async (event, data = {}) => {
+    return await ReorderProject.reorder(data.orderedIds);
+  });
 
 }

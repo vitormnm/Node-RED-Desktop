@@ -256,7 +256,14 @@ This file is created automatically on first launch with sensible defaults by `Se
       "id": "<project-uuid>", // Which project to open
       "url": "http://localhost:1880/red/admin/"
     },
-    "description": ""
+    "description": "",
+    "service": {
+      "name": "Node-RED-Desktop",
+      "description": "Node-RED-Desktop",
+      "onFailureAction": "restart",
+      "onFailureDelay": "5 sec",
+      "startMode": "Automatic"
+    }
   },
   "redundancy": {
     "enabled": false,

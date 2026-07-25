@@ -2,6 +2,10 @@ const { ipcRenderer, contextBridge, ipcRenderer: ipc } = require('electron')
 
 
 contextBridge.exposeInMainWorld('api', {
+    platform: process.platform,
+    isWindows: () => process.platform === 'win32',
+    isLinux: () => process.platform === 'linux',
+    isMac: () => process.platform === 'darwin',
     
     getWindowId: () => {
         //retrieves the window ID when it is opened on the front end.
