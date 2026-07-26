@@ -78,36 +78,17 @@ export default async function () {
         const winHeight = 600;
 
         const isLinux = process.platform === "linux";
-        const isMac = process.platform === "darwin";
 
         let x;
         let y;
 
-        if (isLinux || isMac) {
-            // Ubuntu / Linux GNOME: Top-right corner right below top bar
-            x = workArea.x + workArea.width - winWidth;
+        if (isLinux) {
+            x = workArea.x;
             y = workArea.y;
         } else {
-            // Windows: Bottom-right corner right above taskbar
-            let trayBounds = null;
-            try {
-                if (top.tray && typeof top.tray.getBounds === "function") {
-                    const b = top.tray.getBounds();
-                    if (b && b.width > 0 && b.height > 0) {
-                        trayBounds = b;
-                    }
-                }
-            } catch (e) {
-                trayBounds = null;
-            }
-
-            if (trayBounds) {
-                x = Math.round(trayBounds.x + trayBounds.width / 2 - winWidth / 2);
-                y = Math.round(trayBounds.y - winHeight);
-            } else {
-                x = workArea.x + workArea.width - winWidth;
-                y = workArea.y + workArea.height - winHeight;
-            }
+            // Windows: Glued to bottom-right corner of workArea
+            x = workArea.x + workArea.width - winWidth;
+            y = workArea.y + workArea.height - winHeight;
         }
 
         // Clamp to screen workArea boundaries
@@ -115,27 +96,6 @@ export default async function () {
         y = Math.max(workArea.y, Math.min(y, workArea.y + workArea.height - winHeight));
 
         return { x: Math.round(x), y: Math.round(y), winWidth, winHeight };
-    }
-
-    function applyWindowBounds(win, x, y, width, height) {
-        if (!win || win.isDestroyed()) return;
-
-        // Apply bounds immediately
-        win.setBounds({ x, y, width, height });
-
-        // On Linux / GNOME Mutter, window manager defers placement hints until window map completes.
-        // Re-applying setBounds after map/show via setTimeout guarantees top-right placement on Ubuntu GNOME.
-        setTimeout(() => {
-            if (win && !win.isDestroyed()) {
-                win.setBounds({ x, y, width, height });
-            }
-        }, 50);
-
-        setTimeout(() => {
-            if (win && !win.isDestroyed()) {
-                win.setBounds({ x, y, width, height });
-            }
-        }, 150);
     }
 
     function openWindow(iPage) {
@@ -148,7 +108,7 @@ export default async function () {
             if (isLinux) {
                 win.maximize();
             } else {
-                applyWindowBounds(win, x, y, winWidth, winHeight);
+                win.setBounds({ x, y, width: winWidth, height: winHeight });
             }
             win.show();
             win.focus();

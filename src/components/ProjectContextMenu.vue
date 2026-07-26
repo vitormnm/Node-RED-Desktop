@@ -63,6 +63,8 @@ const menuItems = [
   { title: "Open editor", action: "open_editor", icon: "mdi-monitor", color: "grey" },
   { title: "Open dashboard", action: "open_dashboard", icon: "mdi-view-dashboard", color: "grey" },
   { title: "Open folder", action: "open_folder", icon: "mdi-folder-open", color: "grey" },
+  { divider: true },
+  { title: "Delete", action: "delete", icon: "mdi-delete", color: "red" },
 ];
 
 function handleAction(action) {
