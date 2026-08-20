@@ -375,7 +375,7 @@ function openNewProject() {
     UrlDashboard: `http://localhost:${uiPort}/red/admin`,
     adminAuth: false,
     settings: {
-      flowFile: 'flow.json',
+      flowFile: 'flows.json',
       httpAdminRoot: '/red/admin',
       httpNodeRoot: '/',
       uiPort: uiPort,
