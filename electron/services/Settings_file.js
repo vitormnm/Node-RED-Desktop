@@ -38,7 +38,7 @@ class Settings_file {
       const staticFolder = element.settings.StaticFolder;
 
       const projectPath = path.join(diretorioExecucao, 'Node-RED', project_name);
-      const staticPath = path.join(diretorioExecucao, staticFolder);
+      const staticPath = path.resolve(diretorioExecucao, staticFolder || 'static');
 
       element.settings.userDir = projectPath;
       element.settings.StaticPatch = staticPath;

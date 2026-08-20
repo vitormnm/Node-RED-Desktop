@@ -1,7 +1,7 @@
 {
   "name": "Node-RED-Desktop",
   "private": true,
-  "version": "2.5.0",
+  "version": "2.6.2",
   "type": "module",
   "main": "electron/main.js",
   "scripts": {
@@ -13,18 +13,18 @@
     "build64linux": "npm run build && electron-packager . NodeRedDesktop --icon=./electron/resources/nodered.ico --platform=linux --arch=x64 --out=build --asar --overwrite --win32metadata.CompanyName=VitorMiao --win32metadata.ProductName='Node-RED-Desktop' --prune=true --ignore=\"^/(src|installer|WinSW|public|vite\\.config\\.js|package-lock\\.json|\\.git|\\.vscode|\\.gitignore|\\.gitattributes|\\.npmignore|AGENTS\\.md|README\\.md)\""
   },
   "dependencies": {
-    "node-red": "5.0.1"
+    "node-red": "5.0.4"
   },
   "devDependencies": {
-    "@electron/packager": "20.0.1",
-    "@vitejs/plugin-vue": "6.0.1",
-    "electron": "42.4.0",
+    "@electron/packager": "20.1.1",
+    "@vitejs/plugin-vue": "6.0.8",
+    "electron": "43.2.0",
     "concurrently": "10.0.3",
     "cross-env": "10.1.0",
-    "unplugin-fonts": "1.4.0",
-    "vite": "7.3.3",
+    "unplugin-fonts": "2.0.0",
+    "vite": "8.2.0",
     "wait-on": "9.0.3",
-    "vue": "3.5.24",
+    "vue": "3.5.40",
     "vue-router": "4.6.4",
     "vuetify": "3.11.6",
     "@fontsource/roboto": "5.2.9",

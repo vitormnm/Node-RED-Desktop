@@ -101,6 +101,23 @@ export function registerProjectRoutes() {
     }
   });
 
+  ipcMain.handle('POST:/ctl_project_select_folder', async (event, data = {}) => {
+    try {
+      const win = BrowserWindow.fromWebContents(event.sender);
+      const options = {
+        title: data.title || 'Select Folder',
+        properties: ['openDirectory']
+      };
+      const result = win ? await dialog.showOpenDialog(win, options) : await dialog.showOpenDialog(options);
+      if (!result.canceled && result.filePaths && result.filePaths.length > 0) {
+        return { status: true, canceled: false, folderPath: result.filePaths[0] };
+      }
+      return { status: true, canceled: true, folderPath: null };
+    } catch (error) {
+      return { status: false, message: error.message };
+    }
+  });
+
   ipcMain.handle('PUT:/ctl_project_reorderProjects', async (event, data = {}) => {
     return await ReorderProject.reorder(data.orderedIds);
   });

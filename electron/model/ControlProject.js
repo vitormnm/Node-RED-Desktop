@@ -46,7 +46,7 @@ class ControlProject {
                 const NodeRedPath = path.join(diretorioExecucao, "Node-RED", iPayload.name);
 
                 //static http
-                var StaticPatch = path.join(diretorioExecucao, iPayload.settings.StaticPatch);
+                var StaticPatch = path.resolve(diretorioExecucao, iPayload.settings.StaticFolder || "static");
 
                 var adminAuth = null;
                 //CheckPassword
@@ -144,7 +144,7 @@ class ControlProject {
             const NodeRedPath = path.join(diretorioExecucao, "Node-RED", iPayload.name);
 
             //static http
-            var StaticPatch = path.join(diretorioExecucao, iPayload.settings.StaticPatch);
+            var StaticPatch = path.resolve(diretorioExecucao, iPayload.settings.StaticFolder || "static");
 
             var settings_file = await Settings_file.getFile();
 

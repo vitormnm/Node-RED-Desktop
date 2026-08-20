@@ -401,8 +401,8 @@ async function validate() {
     ok = false;
   }
 
-  if (!fileNameRegex.test(local.settings.StaticFolder)) {
-    errors.StaticFolder.push("Invalid folder name.");
+  if (!local.settings.StaticFolder || !String(local.settings.StaticFolder).trim()) {
+    errors.StaticFolder.push("Static folder cannot be empty.");
     ok = false;
   }
 
@@ -411,14 +411,15 @@ async function validate() {
     ok = false;
   }
 
-  if (local.settings.https.key && !fileNameRegex.test(local.settings.https.key)) {
-    errors.httpsKey.push("Invalid file name.");
-    ok = false;
-  }
-
-  if (local.settings.https.cert && !fileNameRegex.test(local.settings.https.cert)) {
-    errors.httpsCert.push("Invalid file name.");
-    ok = false;
+  if (local.settings.https?.enabled) {
+    if (!local.settings.https.key || !String(local.settings.https.key).trim()) {
+      errors.httpsKey.push("Key file is required when HTTPS is enabled.");
+      ok = false;
+    }
+    if (!local.settings.https.cert || !String(local.settings.https.cert).trim()) {
+      errors.httpsCert.push("Cert file is required when HTTPS is enabled.");
+      ok = false;
+    }
   }
 
   if (local.adminAuth) {

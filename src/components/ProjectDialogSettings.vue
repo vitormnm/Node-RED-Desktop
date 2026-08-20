@@ -110,7 +110,14 @@
 
       <v-text-field label="Flow file name" v-model="local.settings.flowFile" :error-messages="errors.flowFile" />
 
-      <v-text-field label="Folder static files" v-model="local.settings.StaticFolder" :error-messages="errors.StaticFolder" />
+      <v-text-field
+        label="Folder static files"
+        v-model="local.settings.StaticFolder"
+        :error-messages="errors.StaticFolder"
+        append-inner-icon="mdi-folder-open"
+        title="Select static folder"
+        @click:append-inner="selectStaticFolder"
+      />
 
       <v-text-field label="Admin title" v-model="local.settings.editorTheme.page.title" :error-messages="errors.adminTitle" />
 
@@ -141,6 +148,19 @@
 
 <script setup>
 import { computed, watch } from "vue";
+
+async function selectStaticFolder() {
+  try {
+    const res = await window.api.post("/ctl_project_select_folder", {
+      title: "Select Static Files Folder"
+    });
+    if (res && res.status !== false && !res.canceled && res.folderPath) {
+      props.local.settings.StaticFolder = res.folderPath;
+    }
+  } catch (err) {
+    console.error("Error selecting static folder:", err);
+  }
+}
 
 async function selectKeyFile() {
   try {
