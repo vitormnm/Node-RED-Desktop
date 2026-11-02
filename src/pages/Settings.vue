@@ -64,8 +64,23 @@
               v-model="settingsJson.app.service.onFailureAction" density="comfortable" hide-details />
 
             <div class="field-label">On Failure Delay</div>
-            <v-text-field v-model="settingsJson.app.service.onFailureDelay" hide-details class="mb-6"
+            <v-text-field v-model="settingsJson.app.service.onFailureDelay" hide-details class="mb-4"
               placeholder="e.g. 5 sec" :error="errors.serviceOnFailureDelay.length > 0" :error-messages="errors.serviceOnFailureDelay" />
+
+            <div class="field-label">Log Mode</div>
+            <v-select class="mb-4" :items="['roll', 'roll-by-size', 'none', 'append', 'reset']"
+              v-model="settingsJson.app.service.logMode" density="comfortable" hide-details />
+
+            <div v-if="settingsJson.app.service.logMode === 'roll-by-size'">
+              <div class="field-label">Log Size Threshold (KB)</div>
+              <v-text-field type="number" v-model.number="settingsJson.app.service.logSizeThreshold" hide-details class="mb-1"
+                placeholder="10240" :error="errors.serviceLogSizeThreshold.length > 0" :error-messages="errors.serviceLogSizeThreshold" />
+              <div class="muted small mb-4">Size threshold in KB before rolling (default: 10240 KB = 10 MB).</div>
+
+              <div class="field-label">Keep Files</div>
+              <v-text-field type="number" v-model.number="settingsJson.app.service.logKeepFiles" hide-details class="mb-4"
+                placeholder="5" :error="errors.serviceLogKeepFiles.length > 0" :error-messages="errors.serviceLogKeepFiles" />
+            </div>
 
             <v-row class="mt-3" gap="3">
               <v-col cols="auto">
@@ -120,7 +135,10 @@ const settingsJson = reactive({
       description: "Node-RED-Desktop",
       onFailureAction: "restart",
       onFailureDelay: "5 sec",
-      startMode: "Automatic"
+      startMode: "Automatic",
+      logMode: "roll",
+      logSizeThreshold: 10240,
+      logKeepFiles: 5
     }
   },
   redundancy: {
@@ -149,7 +167,9 @@ const errors = reactive({
   port: [],
   serviceName: [],
   serviceDescription: [],
-  serviceOnFailureDelay: []
+  serviceOnFailureDelay: [],
+  serviceLogSizeThreshold: [],
+  serviceLogKeepFiles: []
 });
 
 // carregar ao iniciar
@@ -179,8 +199,15 @@ function rendersettingsJson(iPayload) {
       description: "Node-RED-Desktop",
       onFailureAction: "restart",
       onFailureDelay: "5 sec",
-      startMode: "Automatic"
+      startMode: "Automatic",
+      logMode: "roll",
+      logSizeThreshold: 10240,
+      logKeepFiles: 5
     };
+  } else if (cleanPayload.app && cleanPayload.app.service) {
+    if (!cleanPayload.app.service.logMode) cleanPayload.app.service.logMode = "roll";
+    if (cleanPayload.app.service.logSizeThreshold === undefined) cleanPayload.app.service.logSizeThreshold = 10240;
+    if (cleanPayload.app.service.logKeepFiles === undefined) cleanPayload.app.service.logKeepFiles = 5;
   }
   Object.assign(settingsJson, cleanPayload);
 }
@@ -232,6 +259,17 @@ function validate() {
     if (!settingsJson.app.service.onFailureDelay?.trim()) {
       errors.serviceOnFailureDelay.push("The failure delay cannot be empty.");
       ok = false;
+    }
+
+    if (settingsJson.app.service.logMode === 'roll-by-size') {
+      if (!settingsJson.app.service.logSizeThreshold || Number(settingsJson.app.service.logSizeThreshold) <= 0) {
+        errors.serviceLogSizeThreshold.push("Size threshold must be greater than 0.");
+        ok = false;
+      }
+      if (!settingsJson.app.service.logKeepFiles || Number(settingsJson.app.service.logKeepFiles) <= 0) {
+        errors.serviceLogKeepFiles.push("Keep files must be greater than 0.");
+        ok = false;
+      }
     }
   }
 

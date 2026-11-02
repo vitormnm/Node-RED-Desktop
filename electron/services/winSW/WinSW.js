@@ -92,7 +92,10 @@ class WinSW {
       description: "Node-RED-Desktop",
       onFailureAction: "restart",
       onFailureDelay: "5 sec",
-      startMode: "Automatic"
+      startMode: "Automatic",
+      logMode: "roll",
+      logSizeThreshold: 10240,
+      logKeepFiles: 5
     };
 
     const serviceName = serviceConfig.name || "Node-RED-Desktop";
@@ -100,6 +103,17 @@ class WinSW {
     const onFailureAction = serviceConfig.onFailureAction || "restart";
     const onFailureDelay = serviceConfig.onFailureDelay || "5 sec";
     const startMode = serviceConfig.startMode || "Automatic";
+    const logMode = serviceConfig.logMode || "roll";
+    const logSizeThreshold = serviceConfig.logSizeThreshold ?? 10240;
+    const logKeepFiles = serviceConfig.logKeepFiles ?? 5;
+
+    let logXml = `<log mode="${logMode}"></log>`;
+    if (logMode === 'roll-by-size') {
+      logXml = `<log mode="roll-by-size">
+                <sizeThreshold>${logSizeThreshold}</sizeThreshold>
+                <keepFiles>${logKeepFiles}</keepFiles>
+            </log>`;
+    }
 
     const diretorioExecucao = path.dirname(app.getPath('exe'));
     const appDiretorio = app.getPath('exe');
@@ -116,7 +130,7 @@ class WinSW {
             <workingdirectory>${diretorioExecucao}</workingdirectory>
 
             <logpath>${diretorioExecucao}\\logs</logpath>
-            <log mode="roll"></log>
+            ${logXml}
 
             <onfailure action="${onFailureAction}" delay="${onFailureDelay}"/>
 

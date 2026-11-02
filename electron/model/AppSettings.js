@@ -46,7 +46,10 @@ class RedudancySettings {
       description: serviceData.description || "Node-RED-Desktop",
       onFailureAction: serviceData.onFailureAction || "restart",
       onFailureDelay: serviceData.onFailureDelay || "5 sec",
-      startMode: serviceData.startMode || "Automatic"
+      startMode: serviceData.startMode || "Automatic",
+      logMode: serviceData.logMode || "roll",
+      logSizeThreshold: serviceData.logSizeThreshold !== undefined && serviceData.logSizeThreshold !== null && serviceData.logSizeThreshold !== "" ? Number(serviceData.logSizeThreshold) : 10240,
+      logKeepFiles: serviceData.logKeepFiles !== undefined && serviceData.logKeepFiles !== null && serviceData.logKeepFiles !== "" ? Number(serviceData.logKeepFiles) : 5
     };
 
     delete settings_file.service;

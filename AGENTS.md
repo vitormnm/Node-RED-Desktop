@@ -262,7 +262,10 @@ This file is created automatically on first launch with sensible defaults by `Se
       "description": "Node-RED-Desktop",
       "onFailureAction": "restart",
       "onFailureDelay": "5 sec",
-      "startMode": "Automatic"
+      "startMode": "Automatic",
+      "logMode": "roll",      // "roll" | "roll-by-size" | "none" | "append" | "reset"
+      "logSizeThreshold": 10240, // KB (used when logMode is "roll-by-size", default 10240 = 10MB)
+      "logKeepFiles": 5       // number of rolled files to keep
     }
   },
   "redundancy": {
@@ -398,10 +401,16 @@ The redundancy system allows two separate machines (or processes) to provide hig
 
 ## 9. Windows Service Integration (WinSW)
 
-The `WinSW/` directory ships with `WinSW.exe`. The `WinSW.js` service:
-1. Writes a `WinSW.xml` config pointing to the app's `.exe` with `startmode: Automatic` and `onfailure: restart`.
-2. Runs `WinSW.exe install` → registers the service.
-3. The service runs the full Electron app on system boot (headless, tray-only).
+The `WinSW/` directory ships with `WinSW.exe` (WinSW v2.12.0). The `WinSW.js` service:
+1. Writes a `WinSW.xml` config pointing to the app's `.exe` with configured `startMode`, `onFailureAction`, and log rotation settings.
+2. Supports WinSW v2.12.0 log modes:
+   - `roll` (default): Rolls logs on startup.
+   - `roll-by-size`: Rolls logs when size exceeds `logSizeThreshold` (default: 10240 KB = 10 MB) and keeps `logKeepFiles` (default: 5).
+   - `none`: Disables service stdout/stderr logging.
+   - `append`: Appends to existing log files.
+   - `reset`: Truncates/resets logs on startup.
+3. Runs `WinSW.exe install` → registers the service.
+4. The service runs the full Electron app on system boot (headless, tray-only).
 
 **Requires admin privileges** to install/delete the service.
 
@@ -447,7 +456,9 @@ Outputs to `dist/`. The Electron main process serves `dist/index.html` in produc
 
 ## 11. Build & Packaging
 
-### Windows 64-bit
+> **Default Build Command:** Always use `npm run build64` as the default build command to build the frontend and package the application for validation.
+
+### Windows 64-bit (Default Build)
 
 ```bash
 npm run build64
@@ -545,3 +556,5 @@ Always prefix with the HTTP verb followed by `:`.
 10. **WinSW requires admin** — Service install/delete will fail without elevated privileges. The app does not self-elevate; the user must run it as administrator or use a UAC-prompted shortcut when managing the service.
 
 11. **Node-RED bundled in `node_modules`** — The packaged `node_modules/node-red` is what ships inside the `.asar`. The child process requires the Node.js binary bundled with Electron. `app.getPath('exe')` points to the Electron-wrapped Node.js binary.
+
+12. **Default build command** — Always use `npm run build64` as the default command to build and package the project for testing and validation.

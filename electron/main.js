@@ -5,8 +5,7 @@ import path from 'path';
 import ChildProcessManagerRED from "./services/childProcess/ChildProcessManagerRED.js";
 import electronTray from "./services/electron/electronTray.js";
 import windowMain from "./services/electron/windowMain.js";
-
-
+import Settings_file from "./services/Settings_file.js";
 
 import { fileURLToPath } from 'url';
 async function start() {
@@ -19,7 +18,6 @@ async function start() {
   const { registerProjectRoutes } = await import("./ipc-handlers/project.js");
    const { registerSettingsRoutes } = await import("./ipc-handlers/settings.js");
   const { default: Logger } = await import("./services/Logger.js");
-  const { default: Settings_file } = await import("./services/Settings_file.js");
 
   Logger.info("starting application");
 
@@ -36,6 +34,16 @@ async function start() {
   Logger.info("application started");
 
 }
+
+// Automatically trust certificates for local and project connections (e.g. editor/dashboard iframe with self-signed HTTPS)
+app.on("certificate-error", (event, webContents, url, error, certificate, callback) => {
+  if (Settings_file.isProjectUrl(url)) {
+    event.preventDefault();
+    callback(true);
+    return;
+  }
+  callback(false);
+});
 
 // inicia o app
 start();

@@ -17,6 +17,7 @@ const NodeRedPath = path.join(diretorioExecucao, 'Node-RED', 'main');
 const StaticPatch = path.join(diretorioExecucao, 'Node-RED', 'static');
 
 class Settings_file {
+  #cachedSettings = null;
 
   async initCheckFile() {
     // check file exist
@@ -51,6 +52,7 @@ class Settings_file {
     try {
       const ContentJson = JSON.stringify(iPayload, null, 2);
       await fs.writeFile(filePath, ContentJson);
+      this.#cachedSettings = iPayload;
       return true;
     } catch (error) {
       Logger.error("error write ", error);
@@ -75,6 +77,7 @@ class Settings_file {
         await this.WriteFile(result);
       }
 
+      this.#cachedSettings = result;
       return result
     } catch (err) {
       Logger.info("create default settings.json: " + err);
@@ -87,10 +90,64 @@ class Settings_file {
         const data = await fs.readFile(filePath, { encoding: 'utf8' });
 
         let file = JSON.parse(data);
-
+        this.#cachedSettings = file;
         return file
       }
     }
+  }
+
+  isProjectUrl(urlString) {
+    if (!urlString || typeof urlString !== 'string') return false;
+    try {
+      const parsed = new URL(urlString);
+      const hostname = parsed.hostname.toLowerCase();
+      const port = parsed.port;
+
+      if (
+        hostname === 'localhost' ||
+        hostname === '127.0.0.1' ||
+        hostname === '::1' ||
+        hostname === '[::1]' ||
+        hostname.endsWith('.localhost') ||
+        hostname.endsWith('.local')
+      ) {
+        return true;
+      }
+
+      // Private IPv4 ranges (RFC 1918)
+      if (/^(127\.\d{1,3}\.\d{1,3}\.\d{1,3})$/.test(hostname)) return true;
+      if (/^(192\.168\.\d{1,3}\.\d{1,3})$/.test(hostname)) return true;
+      if (/^(10\.\d{1,3}\.\d{1,3}\.\d{1,3})$/.test(hostname)) return true;
+      if (/^(172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3})$/.test(hostname)) return true;
+
+      if (this.#cachedSettings?.projects && Array.isArray(this.#cachedSettings.projects)) {
+        return this.#cachedSettings.projects.some((p) => {
+          try {
+            const adminUrl = p.UrlAdmin ? new URL(p.UrlAdmin) : null;
+            const dashUrl = p.UrlDashboard ? new URL(p.UrlDashboard) : null;
+            const defaultPort = parsed.protocol === 'https:' ? '443' : '80';
+            const reqPort = port || defaultPort;
+
+            const matchAdmin =
+              adminUrl &&
+              adminUrl.hostname.toLowerCase() === hostname &&
+              (adminUrl.port || (adminUrl.protocol === 'https:' ? '443' : '80')) === reqPort;
+
+            const matchDash =
+              dashUrl &&
+              dashUrl.hostname.toLowerCase() === hostname &&
+              (dashUrl.port || (dashUrl.protocol === 'https:' ? '443' : '80')) === reqPort;
+
+            return Boolean(matchAdmin || matchDash);
+          } catch {
+            return false;
+          }
+        });
+      }
+    } catch {
+      return false;
+    }
+    return false;
   }
 
 
@@ -143,7 +200,10 @@ class Settings_file {
             description: "Node-RED-Desktop",
             onFailureAction: "restart",
             onFailureDelay: "5 sec",
-            startMode: "Automatic"
+            startMode: "Automatic",
+            logMode: "roll",
+            logSizeThreshold: 10240,
+            logKeepFiles: 5
           }
         },
         redundancy: {
