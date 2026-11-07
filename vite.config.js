@@ -40,4 +40,13 @@ export default defineConfig({
       '.vue',
     ],
   },
+  optimizeDeps: {
+    include: [
+      'vuetify/components/VOverlay',
+      'vuetify/components/VDialog',
+      'vuetify/components/VMenu',
+      'vuetify/components/VSelect',
+      'vuetify/components/VTooltip',
+    ],
+  },
 })

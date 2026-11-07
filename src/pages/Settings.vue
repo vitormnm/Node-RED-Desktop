@@ -2,11 +2,11 @@
   <v-card class="settings-card pa-4">
           <h3 class="subheading">Project start window</h3>
 
-          <v-row class="mt-4" align="center">
+          <v-row class="mt-4 align-center">
             <v-checkbox v-model="settingsJson.app.startupProjectWindow.enabled" density="compact" label="enabled" />
           </v-row>
 
-          <v-row align="center">
+          <v-row class="align-center">
             <v-checkbox v-model="settingsJson.app.startupProjectWindow.fullscreen" density="compact" label="full screen" />
           </v-row>
 
@@ -22,7 +22,7 @@
 
           <h3 class="subheading">Redudancy</h3>
 
-          <v-row class="mb-2" align="center">
+          <v-row class="mb-2 align-center">
             <v-checkbox v-model="settingsJson.redundancy.enabled" label="Enabled redudancy" />
           </v-row>
 

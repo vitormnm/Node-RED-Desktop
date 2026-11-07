@@ -5,7 +5,7 @@
     location="bottom start"
     :close-on-content-click="true"
   >
-    <v-list density="compact" class="project-context-menu pa-1 elevation-6">
+    <v-list density="compact" class="project-context-menu pa-1 elevation-5">
       <template v-for="(item, index) in menuItems" :key="item.action || index">
         <v-divider v-if="item.divider" class="my-1" />
         <v-list-item

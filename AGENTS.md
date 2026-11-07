@@ -47,12 +47,12 @@ Supported platforms: Windows 10/11 x64, Ubuntu LTS x64.
 
 | Layer | Technology | Version (package.json) |
 |---|---|---|
-| Desktop shell | Electron | 42.x |
+| Desktop shell | Electron | 45.x |
 | Frontend framework | Vue 3 (Composition API `<script setup>`) | 3.5.x |
-| UI component library | Vuetify | 3.x |
+| UI component library | Vuetify | 4.x |
 | Routing | Vue Router (hash history) | 4.x |
-| Build tool | Vite | 7.x |
-| Node-RED runtime | node-red | 5.0.0 |
+| Build tool | Vite | 8.x |
+| Node-RED runtime | node-red | 5.0.x |
 | Password hashing | bcryptjs | (transitive) |
 | Packaging | @electron/packager | 20.x |
 | Windows service wrapper | WinSW (binary in `WinSW/`) | bundled |

@@ -47,7 +47,7 @@
 
         <template #item.name="{ item }">
           <v-chip
-            small
+            size="small"
             class="ma-0 name-chip"
             text-color="white"
             :color="item.projectsStatus.color"
