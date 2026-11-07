@@ -1,7 +1,7 @@
 {
   "name": "Node-RED-Desktop",
   "private": true,
-  "version": "2.6.3",
+  "version": "2.7.0",
   "type": "module",
   "main": "electron/main.js",
   "scripts": {
